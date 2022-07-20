@@ -1,0 +1,1066 @@
+title,body
+"JpGraph error in PHP image saving permission: ""JpGraph Error: 25107""","<p>My PHP JpGraph code displays error like </p>
+
+<pre><code>The image ""http://localhost/jpeg/src/Examples/x.php"" cannot be displayed
+because it contains error
+</code></pre>
+
+<p>When I search the post <a href=""https://stackoverflow.com/questions/24493957/php-gd-the-image-cannot-be-displayed-because-it-contains-errors"">here</a> and <a href=""https://stackoverflow.com/questions/10297900/php-gd-image-cannot-be-displayed-because-it-contains-errors"">here</a>, the main problem indicated was <strong>white space</strong> at the  beginning or end or the problem with the header. But I could not find a whitespace (I hope the header is okAY because it's a simplest manual example).</p>
+
+<p>Just for a try, I tried to save the image instead of display in browser. But it showed another problem as <strong>JpGraph Error: 25107 Can't write to file</strong>, php process has no permission. But I couldnot solve the second error after searching some source. I worry whether I go wrong path and doing some blind thing. Can anyone direct me?</p>
+
+<p>I use  the code to generate JpGraph:</p>
+
+<pre><code>&lt;?php 
+ini_set('display_errors', 1);
+error_reporting(E_ALL ^ E_NOTICE);
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_matrix.php'); 
+
+$data = array(
+array(0,1,2,3,4,5,6,7,8,9,10),
+array(10,9,8,7,6,5,4,3,2,1,0),
+array(0,1,2,3,4,5,6,7,8,9,10),
+array(10,9,8,17,6,5,4,3,2,1,0),
+
+); 
+
+$graph = new MatrixGraph(400,300);
+$graph-&gt;title-&gt;Set('Basic matrix example');
+$graph-&gt;title-&gt;SetFont(FF_ARIAL,FS_BOLD,14); 
+
+ $mp = new MatrixPlot($data);
+ $graph-&gt;Add($mp); 
+//$graph-&gt;Stroke(); 
+$graph-&gt;Stroke(""myimage.png"");
+?&gt;
+</code></pre>
+"
+"","<p>I solved the problem. It was a problem due to whites space, but in some of the source files. Here are the two steps I followed to overcome the error,</p>
+
+<ol>
+<li><p>In the php.ini file, set the output buffering as 0 instead of 4096.</p></li>
+<li><p>In the source files (jpgraph_matrix.php  and jpgraph_glayout_vh.inc.php), there were  some extra white space at the beginning and at the end. When done the first step (set the buffer), the white space containing files and lines were displayed in browser. When those lines were removed, the graph is generated. </p></li>
+</ol>
+"
+"Input data from csv doessnt work for jpgraph line plot","<p>I tried to generate a line plot using jpgraph. It works well when array is specified manually. But when I tired to receive data from csv file, only plot is generated, but data lines not shown. I couldnt find anything wrong in my input and in display the values on printing array,</p>
+
+<pre><code>print_r ($data[2]); printing displays Array ( [1] =&gt; 22.7625 [2] =&gt; 7.1984) 
+</code></pre>
+
+<p>Searching the manual didn't solve my problem. Anyone know the reason?</p>
+
+<p>Info: Here is how I have extracted data from csv file,</p>
+
+<pre><code>$handle = fopen(""/var/www/html/xx/yy/myfile.csv"", ""r"");
+
+$data[$i] = fgetcsv($handle, "","");
+</code></pre>
+
+<p>I removed the first element since it is an ID.</p>
+
+<pre><code>unset($data[2] [0]);
+</code></pre>
+
+<p>Edit:</p>
+
+<pre><code>&lt;?php
+include ( ""../jpgraph.php"");
+include (""../jpgraph_line.php"");
+
+$handle = fopen(""/var/www/html/xx/yy/myfile.csv"", ""r"");
+
+for ($i=0;$i&lt;=10;$i++)
+{
+    $data[$i] = fgetcsv($handle, "","");
+    unset($data[2] [0]);
+}    
+
+$graph = new Graph(350, 250,""auto"");    
+$graph-&gt;SetScale( ""textlin"");
+
+$lineplot =new LinePlot($data[2]);
+$lineplot -&gt;SetColor(""blue"");
+$graph-&gt;Add( $lineplot);
+$graph-&gt;Stroke();
+?&gt; 
+</code></pre>
+"
+"Mysql select array of columns based on id","<p>I am trying to fetch mysql columns based on user checkbox. This means if user select one checkbox (ex, value2), then retrieve only value2 named colum from table.  Is there any way to explicitly specify in mysql select command to retrieve all the user checked values (may be from an array).</p>
+
+<pre><code>&lt;form action=""yyy.php"" method=""post""&gt;
+&lt;input type=""checkbox"" name=""check_list[]"" value=""value 1""&gt;
+&lt;input type=""checkbox"" name=""check_list[]"" value=""value 2""&gt;
+&lt;input type=""checkbox"" name=""check_list[]"" value=""value 3""&gt;
+&lt;input type=""submit"" /&gt;
+&lt;/form&gt;
+</code></pre>
+
+<p>I tried received values in array and used like following, but it doesnt work</p>
+
+<pre><code>&lt;?php
+if(!empty($data = $_POST['check_list']))   
+//cut some parts and simplified to focus on my problem
+ $sql = ""SELECT $data  FROM mydata WHERE id='$id'""; 
+?&gt;
+</code></pre>
+
+<p>In some posts, I noticed using array for the $id <a href=""https://stackoverflow.com/questions/2382831/select-from-mysql-table-where-field-array"">like here</a>. Other method may be looping select statement, but I am not sure.</p>
+
+<p>I am not an expert in this field and would like to know any solution [better] solution for this.</p>
+"
+"Prevent button to page redirect in html","<p>I have a few buttons and a submit button. (Making simple) My idea is to receive the value of the clicked button using a php and display it <strong>only when submit</strong>. Here I face a problem that button click itself redirects to the page and displays the value (means it is not waiting for the submit button to press). I followed a javascript provided <a href=""https://stackoverflow.com/questions/2635370/how-to-stop-page-redirect"">here</a>. But didn’t work. Any method to achieve this? </p>
+
+<pre><code>&lt;form action=""calculate.php"" method=""POST""&gt;
+
+&lt;button type="""" name=""btn"" style=""background-color:#7F77AE"" value=""Alf""&gt;x1&lt;/button&gt;
+&lt;button type="""" name=""btn"" style=""background-color:#7F77AE"" value=""ABI""&gt;y1&lt;/button&gt;
+&lt;button type="""" name=""btn"" style=""background-color:#7F77AE"" value=""APE""&gt;z1&lt;/button&gt;
+
+&lt;input type=""submit"" value=""Submit""&gt;
+</code></pre>
+
+<p>php part is as simple as,</p>
+
+<pre><code> $button = $_POST['btn']; 
+ echo $button;
+</code></pre>
+"
+"Omit a column while writing mysql data into a csv file using fputcsv","<p>My code for fetching mysql rows and write to csv file using fputscv is working fine. But I want to omit first column while writing to the csv file. Clearly telling, all the fetched values are different points of a graph and I would be directly importing that generated csv file for a graph generating code. The id (which is not a graph point) will be included in csv file if I use a query like,</p>
+
+<pre><code>$sql = ""SELECT * FROM mybase WHERE id='$id'"";
+$qry = $dbo-&gt;prepare($sql);
+$qry-&gt;execute();
+$row = $qry-&gt;fetch(PDO::FETCH_ASSOC);       
+fputcsv($data, $row);
+</code></pre>
+
+<p>Anyone knows the best method to eliminate the ID before writing into the csv file.?</p>
+
+<p>I  saw an obvious and simple result <a href=""https://stackoverflow.com/questions/24123508/how-to-skip-some-fields-from-database-while-using-fputcsv"">here</a>. Unfortunately, I have too many columns and it is difficult to specify each column in sql query. Thanks..</p>
+"
+"echo an image inside html table using php","<p>I tried to generate a html table with only 2 cells using PHP. First table cell is an image and second cell has another table. I can put the data which I want in second cell (in table format). But failed to display image in first table cell. </p>
+
+<p>Searching the forum  showed some solved echo related to issue, but it couldn’t solve my problem.</p>
+
+<p>Here is the code I used,</p>
+
+<pre><code>if(array_filter($values2))
+{
+
+     echo ""&lt;!DOCTYPE html&gt;"";
+     echo ""&lt;html&gt;"";
+     echo ""&lt;head&gt;"";
+     echo ""&lt;table&gt;"";
+
+     echo ""&lt;tr&gt;"";
+     echo ""&lt;td&gt;"";
+     echo ""&lt;img src = treedir . '/' .  $tffam;?&gt;""; //my problem here
+     echo ""&lt;/td&gt;"";              
+
+     echo ""&lt;td&gt;"";
+     //a table generating code and it  works fine
+     echo ""&lt;/td&gt;"";
+     echo ""&lt;/tr&gt;"";
+     echo ""&lt;/body&gt;"";
+     echo ""&lt;/html&gt;""; 
+
+}
+</code></pre>
+"
+"Mysql rows to html table using for loop","<p>I tried to print the Mysql fetched rows into html table using php. However, when using the following code, the first fetched row is repeatedly printing. It looks like the $row hold the first fetched value. I found a similar problem <a href=""https://stackoverflow.com/questions/17426749/display-mysql-rows-in-html-table"">here</a>. But I would like to know about working with the for loop. Thanks</p>
+
+<pre><code>for ($j=0;$j&lt;=$len2;$j++)
+ {       
+
+ $sql = ""SELECT * FROM database_search WHERE gene_id LIKE'%$key%'"";    
+
+ $qry = $dbo-&gt;prepare($sql);
+ $qry-&gt;execute();
+ $row = $qry-&gt;fetch(PDO::FETCH_ASSOC);     
+ $val = array_values($row);
+
+
+
+echo ""&lt;tr&gt;"";
+for ($k=0;$k&lt;=4;$k++)
+    { 
+           $x=$val[$k];         
+      echo ""&lt;td style=font-size:7.9px&gt;$x&lt;/td&gt;""; 
+
+    }
+echo ""&lt;/tr&gt;"";
+</code></pre>
+
+<p>}</p>
+"
+"Installing Perl GD on Ubuntu 14.04","<p>My aim is to run Circos plot  on Ubuntu 14.04. I installed every perl modules required except GD and GD::Polyline. When I run the command <strong>$sudo cpan GD</strong>, it fails to install GD. I found similar problems reported <a href=""http://www.cpantesters.org/cpan/report/4e32ae28-b495-11e4-8502-0b9cc5dea601"" rel=""nofollow noreferrer"">Here</a> and <a href=""https://stackoverflow.com/questions/27597167/cannot-install-gd-module-on-darwin-13-0-1-using-cpan"">here</a>. But I couldn’t understand and solve it. Can anyone know an alternative way to install it?</p>
+
+<p><strong>Here is the error,</strong></p>
+
+<pre><code> Reading '/home/junglab/.cpan/Metadata'
+ Database was generated on Fri, 10 Apr 2015 05:41:02 GMT
+ Running install for module 'GD'
+ Running make for L/LD/LDS/GD-2.56.tar.gz
+ Checksum for /home/junglab/.cpan/sources/authors/id/L/LD/LDS/GD-2.56.tar.gz ok
+
+ CPAN.pm: Building L/LD/LDS/GD-2.56.tar.gz
+
+ Configuring for libgd version 2.1.1-dev@.
+Checking for stray libgd header files...none found.
+
+Unknown option: installdirs
+Usage: perl Build.PL [options]
+
+Configure GD module.
+
+ Options:
+ -options       ""JPEG,FT,PNG,GIF,XPM,ANIMGIF""   feature options, separated by commas
+ -lib_gd_path   path            path to libgd
+ -lib_ft_path   path            path to Freetype library
+ -lib_png_path  path            path to libpng
+ -lib_jpeg_path path            path to libjpeg
+ -lib_xpm_path  path            path to libxpm
+ -lib_zlib_path path            path to libpng
+ -ignore_missing_gd             Ignore missing or old libgd installations and try to compile anyway
+
+If no options are passed on the command line.  The program will
+attempt to autoconfigure itself with the gdlib-config program (present
+in GD versions 2.0.27 or later).  Otherwise it will prompt for these
+values interactively.
+
+Warning: No success on command[/usr/bin/perl Build.PL --installdirs site]
+ 'YAML' not installed, will not store persistent state
+  LDS/GD-2.56.tar.gz
+
+/usr/bin/perl Build.PL --installdirs site -- NOT OK
+Running Build test
+Make had some problems, won't test
+Running Build install
+Make had some problems, won't install
+Could not read metadata file. Falling back to other methods to determine prerequisites
+</code></pre>
+"
+"How can I install ssh2 in Windows_NT (Azure web service) to connect VM from web service?","<p>To make my question more clear, I'm breaking them into parts.</p>
+
+<ol>
+<li>I have created webpage in Microsoft azure using app service {<a href=""http://####.azurewebsites.net"" rel=""nofollow noreferrer"">http://####.azurewebsites.net</a>}</li>
+<li><p>I have created virtual machine linux (Ubuntu) platform </p></li>
+<li><p>Both the service (web and vm) are in the same account (####@outlook.com).</p></li>
+</ol>
+
+<p>Now, I want to connect <strong>web service</strong> with <strong>vm</strong>. I have seen solutions connecting using ssh2 in php codes as shown <a href=""https://stackoverflow.com/questions/18799799/ssh-connection-to-a-remote-server-using-php"">here</a>. </p>
+
+<p>I tried this in my local system (ubuntu). It was working fine. 
+Now I want to connect to vm from web service. For this purpose how can I install ssh2 in webservice provided by azure.
+I have logged into azure web service via ftp using terminal. <a href=""https://i.stack.imgur.com/VVIJW.png"" rel=""nofollow noreferrer""><img src=""https://i.stack.imgur.com/VVIJW.png"" alt=""enter image description here""></a> It shows <strong>remote system is Windows_NT</strong>. </p>
+
+<p>How can I install ssh2 into webservice so that I can access vm from webservice.</p>
+
+<p>Any help appreciated. Thank You</p>
+"
+"","<p>​sudo apt-get install libtbb-dev</p>
+
+<p>​make</p>
+"
+"","<pre><code>import nltk
+stopwords = nltk.corpus.stopwords.words('english')
+new_words=('re','name', 'user', 'ct')
+for i in new_words:
+    stopwords.append(i)
+print(stopwords)
+</code></pre>
+"
+"","<pre><code>import pandas as pd
+df=pd.read_csv(""file.txt"", skipinitialspace=True)
+df.head()
+df['review']
+</code></pre>
+"
+"","<p>Try following for custom tagging:</p>
+
+<pre><code>import nltk.tag, nltk.data
+from nltk.tag.perceptron import PerceptronTagger
+default_tagger = PerceptronTagger()
+</code></pre>
+
+<p>Define your model with custom tags:</p>
+
+<pre><code>model={""paining"": ""Reaction"", ""Itching"":""Reaction"", ""Removed"":""Reaction"", ""skin"":""site""}
+
+class BackoffTagger:
+    def __init__(self):
+        self._taggers = [PerceptronTagger()]
+
+tagger = nltk.tag.UnigramTagger(model=model, backoff=BackoffTagger())
+tagger.tag(['skin'])
+</code></pre>
+
+<p><strong>Output</strong>:</p>
+
+<blockquote>
+  <p>[('skin', 'site')]</p>
+</blockquote>
+"
+"","<pre><code>import glob
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+%matplotlib inline
+
+images = []
+for img_path in glob.glob('folder/*.png'):
+    images.append(mpimg.imread(img_path))
+
+plt.figure(figsize=(20,10))
+columns = 5
+for i, image in enumerate(images):
+    plt.subplot(len(images) / columns + 1, columns, i + 1)
+    plt.imshow(image)
+</code></pre>
+
+<p>where 'folder' contains images with .png extension</p>
+"
+"Comparing data using lookup and output only longest phrase in the data using python?","<p>I have a csv which contains ""KKR"" map to ""MBI"" data. I want to perform a lookup from a user given data to extract the longest matched phrase from KKR (ignore small phrase if it contains words of long phrase)</p>
+
+<pre><code>#os.chdir(""kkr_lookup"")
+data = pd.read_csv(""KKR_MBI_MAP.csv"")
+
+dfData = pd.DataFrame(data)
+
+dfVerbatim = pd.DataFrame()
+
+dataVerbatim = {'verbatim': ['She experienced skin allergy and hair loss after using it for 2-3 weeks']}
+dfVerbatim = pd.DataFrame(dataVerbatim, columns = ['verbatim'])
+
+
+for index, frame in dfData.iterrows():
+    if pd.notnull(frame['KKR']) &amp; dfVerbatim['verbatim'].str.contains(frame['KKR'], case=False).bool() :
+        k=(frame['MBI']).lower()
+        l=(frame['KKR']).lower()
+        print(""MBI:"",l)
+        #print(""MBI:"",k)
+</code></pre>
+
+<p>The code gives output as:</p>
+
+<pre><code>allergy
+hair loss
+skin allergy
+</code></pre>
+
+<p>But I need out as:</p>
+
+<pre><code>skin allergy
+hair loss
+</code></pre>
+
+<p>Here I have coded to extract the terms from user input data. But it extracts both ""allergy"" and ""skin allergy"" whereas I need only ""skin allergy"" here.
+Please help me...</p>
+"
+"How to extract longer strings and ignore sub-strings from given sentence?","<p>I have a list of strings and a sentence as follows:</p>
+
+<pre><code>list_of_strings=[""skin allergy"",""hair loss"",""allergy"",""hair"", ""skin""]
+
+sentence=""She experienced skin allergy and hair loss after using it for 2-3 weeks""
+</code></pre>
+
+<p>and I want to match <code>list_of_strings</code> to the <code>sentence</code> and print output as only longer phrase (ignoring substring):</p>
+
+<pre><code>skin allergy
+hair loss
+</code></pre>
+
+<p>I wrote this <a href=""https://stackoverflow.com/questions/58836195/comparing-data-using-lookup-and-output-only-longest-phrase-in-the-data-using-pyt"">code</a>: But this extracts everything that matches.</p>
+"
+"","<p>You can use pandas <code>drop_duplicates</code> which returns only the dataframe’s unique values.</p>
+
+<pre><code>df = df.drop_duplicates()
+print(df)
+</code></pre>
+"
+"How to remove duplicates of column by giving appropriate value to its label in the row?","<p>I have an excel table as follows (contains more data than displayed):</p>
+
+<p><a href=""https://i.stack.imgur.com/FJrhI.png"" rel=""nofollow noreferrer""><img src=""https://i.stack.imgur.com/FJrhI.png"" alt=""enter image description here""></a></p>
+
+<p>First column contains <code>ids</code>, second column contains <code>labels</code> and the row contains <code>unique labels</code> without any repetition.
+Here, I need to remove the duplicates in the <code>ids</code>, by giving value <code>1</code> to the appropriate <code>label</code> column per row.</p>
+
+<p>The expected out is:</p>
+
+<p><a href=""https://i.stack.imgur.com/AOeAn.png"" rel=""nofollow noreferrer""><img src=""https://i.stack.imgur.com/AOeAn.png"" alt=""enter image description here""></a></p>
+"
+"","<pre><code>import re
+
+list_of_strings=[""skin allergy"",""hair loss"",""allergy"",""hair"", ""skin""]
+sentence=""She experienced skin allergy and hair loss after using it for 2-3 weeks""
+pattern = re.compile(r""(\b"" + ""|"".join(list_of_strings) + r"")\b"")
+
+m = pattern.findall(sentence)
+print(m)
+</code></pre>
+"
+"","<p>You can use following code for detecting the language for each row</p>
+
+<pre><code>for index, row in df['text'].iteritems():
+    lang = detect(row) #detecting each row
+    df.loc[index, 'language'] = lang
+</code></pre>
+"
+"Compare two files and print all values horizontally if ids are matching?","<p>Hi I have two files as follows:
+File1.txt</p>
+
+<pre><code>10   A   B  C
+10   A   D  K
+11   X   Y  Z
+10   A   K  B 
+11   Y   X  A 
+</code></pre>
+
+<p>File2.txt</p>
+
+<pre><code>10
+11
+12
+</code></pre>
+
+<p>The expected output is</p>
+
+<pre><code>10 A  B  C  A  D  K  A  K  B
+11 X  Y  Z  Y  X  A 
+</code></pre>
+
+<p>I tried the command <code>grep -f File1.txt file2.txt</code></p>
+
+<p>But it did not give me all value coming under same id</p>
+"
+"How to split a heat map or a draw a boundary with specific range?","<p>I have a expression matrix containing three groups. I need to draw or split the heat-map with specific range of column.</p>
+
+<pre><code>Total number of colums: 151 where 1st column is gene ids
+Group1: 2:40
+Group2: 41:80
+Group3: 81:151
+</code></pre>
+
+<p>I searched for splitting the heatmap and I got some hits like <a href=""https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#order-of-slices"" rel=""nofollow noreferrer"">this</a>. 
+But they are based on specific clusters.
+I need to give my range as <code>(2:40, 41:80, 81:151)</code> for splitting or making boundary for the heatmap</p>
+"
+"How to extract the heatmap of from a set of gene interest from main heatmap?","<p>I have made a heatmap based on following script.</p>
+<pre><code>#load the library
+library(pheatmap)
+
+#set label font
+par(cex.lab=1.5) # is for y-axis
+par(cex.axis=1.5) # is for x-axis
+
+#Set the working directory
+setwd(&quot;F:\\User\\OneDrive\\data\\final\\Rcode&quot;)
+
+
+#hedge
+#read the expression matrix
+hedge &lt;- read.table(&quot;hedge.txt&quot;,sep=&quot;\t&quot;,header = TRUE)
+
+#Group the data in the frame
+group_df = data.frame(Groups=rep(c(&quot;AP&quot;,&quot;CP&quot;,&quot;BP&quot;),c(6,42,28)))
+
+#Assign the col name to the matrix
+rownames(group_df) = colnames(hedge)[2:ncol(hedge)]
+
+#Assign the rownames
+rownames(hedge) = hedge[,1]
+
+#plot the heatmap with specific split
+pheatmap(hedge[,-1],cluster_cols=FALSE,
+         annotation_col=group_df, gaps_col = cumsum(c(6,42,28)))
+</code></pre>
+<p>I got following heatmap from the code:<a href=""https://i.stack.imgur.com/ZiXfT.png"" rel=""nofollow noreferrer""><img src=""https://i.stack.imgur.com/ZiXfT.png"" alt=""enter image description here"" /></a></p>
+<p>Now I want to extract and replot a subplot from the main heatmap using gene set of my interest (CD34, CD117, CD38, SHH, GLI1, GLI2, GLI3, BCL2, PTCH1, PTCH2, SMO). How can I do this?</p>
+"
+"How to plot different groups with different colors using plot function in R","<p>Hi I have used following code to generate a plot a data in a matrix</p>
+
+<pre><code>#load the data
+data &lt;- read.table(""hedge.txt"",sep=""\t"",header=TRUE,row.names=1)
+data_matrix &lt;- data.matrix(data)
+
+#plot bcl2
+plot(data_matrix[""BCL2"",],col=""blue"")
+</code></pre>
+
+<p>and I got following as the plot. But I need to plot 1:6, 7:49, 50:76 as three different colors?</p>
+"
+"How to execute a script in parallel in bash?","<p>I have a folder containing files with extension <strong>.bam</strong>. I want to run following script simultaneously and create separate output for each input name and extension <strong>.txt</strong></p>
+
+<pre><code>samtools depth -ab target_interval.bed 12345XX.bam &gt; 12345XX.txt
+</code></pre>
+
+<p>this command is for single file. I want execute this code at once
+I tried the following code </p>
+
+<pre><code>for i in *.bam; do
+samtools depth -ab target_interval.bed $i.bam &gt; $i.txt
+done
+</code></pre>
+
+<p>but it does not work effectively</p>
+"
+"","<p>People are down voting the question.
+I made simple changes to the script . I just removed the <code>$i.bam</code> and kept only <code>$i</code> . If I use <code>$i.bam</code> it reads file like <code>x.bam.bam</code> which is not available in the directory</p>
+
+<p>The updated code is:</p>
+
+<pre><code>for i in *.bam; do
+samtools depth -ab target_interval.bed $i &gt; $i.txt;
+done
+</code></pre>
+
+<p>Cheers!!!</p>
+"
+"How to append the data from even line to the above odd line?","<p>I have a file (data.txt) like following (with more data)</p>
+
+<pre><code>chr1    11106936    11107192    MTOR
+    7   6   256 0.0234375
+chr1    11106936    11107192    MTOR
+    8   14  256 0.0546875
+chr1    11106936    11107192    MTOR
+    9   7   256 0.0273438
+chr1    11106936    11107192    MTOR
+    11  1   256 0.0039062
+chr1    11106936    11107192    MTOR
+    13  26  256 0.1015625
+chr1    11106936    11107192    MTOR
+    18  1   256 0.0039062
+chr1    11106936    11107192    MTOR
+    19  11  256 0.0429688
+chr1    11106936    11107192    MTOR
+    20  11  256 0.0429688
+chr1    11106936    11107192    MTOR
+    22  13  256 0.0507812
+chr1    11106936    11107192    MTOR
+</code></pre>
+
+<p>I need to align data on even line number to the above odd line as follows</p>
+
+<pre><code>chr1    11106936    11107192    MTOR     7   6   256 0.0234375
+chr1    11106936    11107192    MTOR     8   14  256 0.0546875
+</code></pre>
+"
+"How to map intervals given in a file to the another file and get the count of an item above specified range?","<p>I have two files as follows:
+<strong>file1.txt</strong></p>
+
+<pre><code>#CHR    #START      #END        #GENE   #INDEX  #DEPTH
+chr1    11106936    11106946    MTOR    1       7
+chr1    11106936    11106946    MTOR    2       7
+chr1    11106936    11106946    MTOR    3       40
+chr1    11106936    11106946    MTOR    4       40
+chr1    11106936    11106946    MTOR    5       43
+chr1    11106936    11106946    MTOR    6       50
+chr1    11106936    11106946    MTOR    7       55
+chr1    11106936    11106946    MTOR    8       56
+chr1    11106936    11106946    MTOR    9       55
+chr1    11106936    11106946    MTOR    10      55
+chr1    11106936    11106946    MTOR    11      8
+chr1    11106980    11106995    MTOR    1       8
+chr1    11106980    11106995    MTOR    2       31
+chr1    11106980    11106995    MTOR    3       30
+chr1    11106980    11106995    MTOR    4       28
+chr1    11106980    11106995    MTOR    5       50
+chr1    11106980    11106995    MTOR    6       51
+chr1    11106980    11106995    MTOR    7       52
+chr1    11106980    11106995    MTOR    8       51
+chr1    11106980    11106995    MTOR    9       42
+chr1    11107388    11107396    SDPR    1       8
+chr1    11107388    11107396    SDPR    2       8
+chr1    11107388    11107396    SDPR    3       8
+chr1    11107388    11107396    SDPR    4       8
+chr1    11107388    11107396    SDPR    5       8
+chr1    11107388    11107396    SDPR    6       8
+chr1    11107388    11107396    SDPR    7       9
+chr1    11107388    11107396    SDPR    8       10
+chr1    11107388    11107396    SDPR    9       10
+chr2    24658622    24658634    NCOA1   1       38
+chr2    24658622    24658634    NCOA1   2       38
+chr2    24658622    24658634    NCOA1   3       38
+chr2    24658622    24658634    NCOA1   4       46
+chr2    24658622    24658634    NCOA1   5       46
+chr2    24658622    24658634    NCOA1   6       47
+chr2    24658622    24658634    NCOA1   7       48
+chr2    24658622    24658634    NCOA1   8       49
+chr2    24658622    24658634    NCOA1   9       49
+chr2    24658622    24658634    NCOA1   10      50
+chr2    24658622    24658634    NCOA1   11      50
+chr2    24658622    24658634    NCOA1   12      49
+chr2    24658622    24658634    NCOA1   13      49
+</code></pre>
+
+<p>And <strong>file2.txt</strong></p>
+
+<pre><code>#CHR    #START      #END        #GENE   #MEAN
+chr1    11106936    11106946    MTOR    24.4648438
+chr1    11106980    11106995    MTOR    17.1910114
+chr1    11107388    11107396    SDPR    29.2108269
+chr2    24658622    24658634    NCOA1   12.6104975
+</code></pre>
+
+<p>I want to map the intervals given in the <strong>file2.txt</strong> to <strong>file1.txt</strong> and generate an output file as follows:</p>
+
+<pre><code>#CHR    #START      #END        #GENE   #MEAN       #&lt;=30   #&lt;=40   #&lt;=50
+chr1    11106936    11106946    MTOR    24.4648438  8       8       5
+chr1    11106980    11106995    MTOR    17.1910114  6       5       4
+chr1    11107388    11107396    SDPR    29.2108269  0       0       0
+chr2    24658622    24658634    NCOA1   12.6104975  13      10      2
+</code></pre>
+
+<p>Basically to count how many are more than equal to 30, 40 and 50 in <strong>#DEPTH</strong> column</p>
+"
+"search by kewords and extract the phrase within the delimiter","<p>I have a column data as follows:</p>
+
+<pre><code>abc|frame|gtk|enst.24|pc|hg|,abc|framex|gtk4|enst.35|pxc|h5g|,abc|frbx|hgk4|enst.23|pix|hokg|
+abc|frame|gtk|enst.15|pc|hg|,abc|framex|gtk2|enst.59|pxc|h5g|,abc|frbx|hgk4|enst.18|pif|homg|
+abc|frame|gtk|enst.98|pc|hg|,abc|framex|gtk1|enst.45|pxc|h5g|,abc|frbx|hgk4|enst.74|pig|hofg|
+abc|frame|gtk|enst.34|pc|hg|,abc|framex|gtk1|enst.67|pxc|h5g|,abc|frbx|hgk4|enst.39|pik|hoqg|
+</code></pre>
+
+<p>I want to search and extract specific keywords within the frame and extract only that data with in the separators</p>
+
+<p>Specific keywords are</p>
+
+<pre><code>enst.35
+enst.18
+enst.98
+enst.63
+</code></pre>
+
+<p>The expected output is</p>
+
+<pre><code>abc|framex|gtk4|enst.35|pxc|h5g|
+abc|frbx|hgk4|enst.18|pif|homg|
+abc|frame|gtk|enst.98|pc|hg|
+NA
+</code></pre>
+
+<p>If match is not found fill with NA in the output columns. There can be multiple occurance of id in the same column, but I want to consider only the first occurance.
+I tried this <a href=""https://stackoverflow.com/questions/44000278/extract-sub-string-between-2-special-characters-from-one-column-of-pandas-datafr"">here</a>but was not working effectively. Can we do this with bash script</p>
+"
+"","<p>You can try in bashscript as follows:</p>
+
+<pre><code>for STRING in enst.35 enst.18 enst.98 enst.63; do
+  tr \, \\n &lt; file.txt | grep ""$STRING"" || echo NA
+done
+</code></pre>
+"
+"","<p>can be done as follows:</p>
+<pre><code>df.groupby('StationID').mean()
+</code></pre>
+"
+"How to map values in single column of a dataframe to two columns of another dataframe and extract the mapped values?","<p>I have two data frames</p>
+<pre><code>df1 = pd.read_excel(&quot;data1.xlsx&quot;)
+df2 = pd.read_excel(&quot;data2.xlsx&quot;
+
+df1
+
+Data1   Data2   Score
+ABC      AB1    1
+AB1      ABC    4
+AB2      AB2    6
+ABC      ABD    0.7
+GDH      ABD    0.9
+KMN      KSF    0.5
+KSF      KSF    6
+
+df2
+
+Data1
+AB1
+AB2
+ABC
+</code></pre>
+<p>I want to map <code>df2[&quot;Data1&quot;]</code> to <code>df1</code> and extract the mapping values:</p>
+<pre><code>merged_data = pd.merge(df2, df1, how='inner', left_on='Data1', right_on='Data1')
+merged_data2 = pd.merge(df2, df1, how='inner', left_on='Data1', right_on='Data2')
+
+combined_data = pd.concat([merged_data,merged_data2])
+#remove duplicates
+combined_data_rm = combined_data.drop_duplicates()
+combined_data_rm
+
+Data1   Data2   Score
+ABC      AB1    1
+AB1      ABC    4
+AB2      AB2    6
+ABC      ABD    0.7
+</code></pre>
+<p>Is there any alternate way of doing with analysis using pandas?</p>
+"
+"","<p>You can use the option <code>break.x.by=10</code></p>
+<pre><code>ggsurvplot(sfit, conf.int = FALSE, legend = &quot;bottom&quot;,
+           palette = c(&quot;red&quot;, &quot;blue&quot;),legend.title=&quot;Sex&quot;,
+           risk.table = TRUE, risk.table.col = &quot;strata&quot;,
+           legend.labs=c(&quot;Male&quot;, &quot;Female&quot;),
+           xlim=c(0,100),xscale = 1,
+           ggtheme = theme_survminer(),
+           xlab = &quot;Age at Diagnosis&quot;, size=1.5,
+           ylab=&quot;Cumulative Risk&quot;, pval = FALSE,
+           fun = &quot;event&quot;, break.x.by=10)
+</code></pre>
+<p><a href=""https://i.stack.imgur.com/M2Gr1.png"" rel=""nofollow noreferrer""><img src=""https://i.stack.imgur.com/M2Gr1.png"" alt=""Survivsl Plot"" /></a></p>
+"
+"","<p>Add a new column to your dataset where <code>Control Major</code> as <code>1</code>, <code>Stress Major</code> as <code>2</code>.</p>
+<p>Assign the values correspondingly to all your required groups and then create the comparisons of interest.</p>
+<pre><code>my_comp &lt;- list( c(&quot;1&quot;, &quot;2&quot;), c(&quot;1&quot;, &quot;3&quot;), c(&quot;2&quot;, &quot;3&quot;), c(&quot;3&quot;, &quot;1&quot;))
+</code></pre>
+"
+"","<p>You should put <code>&quot;&quot;</code> in <code>echo</code></p>
+<pre><code>if rsync -avP /data/fastq/ /data/external_hdd/; then
+  echo &quot;transfer complete&quot;
+else
+  echo &quot;transfer failed&quot;
+fi
+</code></pre>
+"
+"Ranking and extracting the data from a column of a dataframe?","<p>I have a file with ranked information:</p>
+<p>df1</p>
+<pre><code>Type                 Rank
+frameshift              1
+stop_gained             2
+stop_lost               3
+splice_region_variant   4
+splice_acceptor_variant 5
+splice_donor_variant    6
+missense_variant        7
+coding_sequence_variant 8
+intron_variant          9
+NMD_transcript_variant  10
+non_coding              11
+</code></pre>
+<p>and another file containing values separated with <code>,</code></p>
+<p>df2['Variants']</p>
+<pre><code>A|intron_variant&amp;NMD_transcript_variant|MODIFIER|23||,A|intron_variant&amp;non_coding|MODIFIER|||,A|intron_variant&amp;non_coding|MODIFIER|||
+G|missense_variant&amp;splice_region_variant|HIGH|85||,A|intron_variant&amp;non_coding|MODIFIER|||,A|intron_variant&amp;non_coding|MODIFIER|||
+G|missense_variant|MODERATE|23||,G|frameshift&amp;intron_variant|HIGH|||,G|intron_variant&amp;non_coding|MODIFIER|||,G|frameshift&amp;missense_variant|HIGH|42||
+G|missense_variant|MODERATE|23||,G|intron_variant|MODIFIER|||,G|intron_variant&amp;non_coding|MODIFIER|||,G|stop_gained&amp;splice_region_variant|HIGH|||
+G|missense_variant|MODERATE|23||
+G|missense_variant&amp;stop_lost|HIGH|12||
+</code></pre>
+<p>I want to extract the data from <code>df2['Variants']</code> based on the rank order mentioned in the <code>df1</code>. some complication in the data are sometimes they are given combinedly with <code>&amp;</code> as <code>frameshift&amp;intron_variant</code>. In such cases, I want to split the data by <code>&amp;</code> consider it by their rank. Likewise, I want to extract the values from the data as:</p>
+<pre><code>Extracted                                                   Ranked
+A|intron_variant&amp;NMD_transcript_variant|MODIFIER|23||       intron_variant
+G|missense_variant&amp;splice_region_variant|HIGH|85||          splice_region_variant
+G|frameshift&amp;intron_variant|HIGH|||                         frameshift
+G|stop_gained&amp;splice_region_variant|HIGH|||                 stop_gained
+G|missense_variant|MODERATE|23||                            missense_variant
+G|missense_variant&amp;stop_lost|HIGH|12||                      stop_lost
+</code></pre>
+<p>I was able to split the files using <code>&amp;</code> using the code given <a href=""https://stackoverflow.com/questions/65951583/how-to-replace-the-column-of-dataframe-based-on-priority-order/65952228"">here</a>. But unable to extract high ranked  variants given in df1 from multiple values separated by <code>,</code> comma.</p>
+<p>Thanks</p>
+"
+"","<p>@jezrael please see the data</p>
+<pre><code>#df1
+Type    Rank
+a       1
+b       2
+c       3
+d       4
+e       5
+
+#df2['Variants']
+
+K|a&amp;b|MOD|,K|d|LOW|,K|a&amp;e|MOD|
+J|c&amp;d&amp;a|MOD|,J|b&amp;c&amp;d|MOD|
+H|b&amp;c|HIGH|,H|b|
+
+#output
+Extracted                   Ranked
+K|a&amp;b|MOD|                  a
+J|c&amp;d&amp;a|MOD|                a
+H|b&amp;c|HIGH|                 b
+</code></pre>
+"
+"How to reframe the columns based on row values?","<p>I have a dataframe as follows:
+I want to shrink the data such that column name contains only row values</p>
+<pre><code>data = {&quot;CHROM&quot;:[&quot;chr1&quot;, &quot;chr1&quot;, &quot;chr2&quot;, &quot;chr1&quot;, &quot;chr7&quot;],
+        &quot;Sample&quot;:[&quot;003C&quot;, &quot;001C1&quot;, &quot;001C1&quot;, &quot;001C&quot;, &quot;003C&quot;],
+        &quot;001C1.GT&quot; :[&quot;C/C&quot;, &quot;G/G&quot;, &quot;G/A&quot;, &quot;C/C&quot;, &quot;G/G&quot;],
+        &quot;001C1.AD&quot;:[&quot;2,0&quot;, &quot;8,0&quot;, &quot;1,2&quot;, &quot;1,0&quot;, &quot;2,0&quot;],
+        &quot;001C1.DP&quot;:[&quot;2&quot;, &quot;8&quot;, &quot;3&quot;, &quot;1&quot;, &quot;2&quot;],
+        &quot;001P1.GT&quot;:[&quot;C/C&quot;, &quot;G/G&quot;, &quot;G/G&quot;, &quot;C/C&quot;, &quot;G/G&quot;],
+        &quot;001P1.AD&quot;:[&quot;1,0&quot;, &quot;9,0&quot;, &quot;3,0&quot;, &quot;3,0&quot;, &quot;8,0&quot;],
+        &quot;001P1.DP&quot;:[&quot;1&quot;, &quot;9&quot;, &quot;3&quot;, &quot;3&quot;, &quot;8&quot;],
+        &quot;001P2.GT&quot;: [&quot;C/C&quot;, &quot;G/G&quot;, &quot;G/G&quot;, &quot;C/C&quot;, &quot;G/G&quot;],
+        &quot;001P2.AD&quot;:[&quot;5,0&quot;, &quot;2,0&quot;, &quot;3,0&quot;, &quot;5,0&quot;, &quot;7,0&quot;],
+        &quot;001P2.DP&quot;:[&quot;5&quot;, &quot;2&quot;, &quot;3&quot;, &quot;5&quot;, &quot;7&quot;],
+        &quot;003C.GT&quot;:[&quot;C/C&quot;, &quot;G/G&quot;, &quot;G/G&quot;, &quot;C/C&quot;, &quot;G/G&quot;], 
+        &quot;003C.AD&quot;:[&quot;2,0&quot;, &quot;7,0&quot;, &quot;4,0&quot;, &quot;13,0&quot;, &quot;6,0&quot;],
+        &quot;003C.DP&quot;:[&quot;2&quot;, &quot;7&quot;, &quot;4&quot;, &quot;13&quot;, &quot;6&quot;], 
+        &quot;003P1.GT&quot;:[&quot;C/C&quot;, &quot;G/G&quot;, &quot;G/G&quot;, &quot;C/C&quot;, &quot;G/G&quot;],
+        &quot;003P1.AD&quot;:[&quot;1,0&quot;, &quot;4,0&quot;, &quot;2,0&quot;, &quot;7,0&quot;, &quot;7,0&quot;],
+        &quot;003P1.DP&quot;:[&quot;1&quot;, &quot;4&quot;, &quot;2&quot;, &quot;7&quot;, &quot;7&quot;],
+        &quot;003P2.GT&quot;:[&quot;C/C&quot;, &quot;G/G&quot;, &quot;G/G&quot;, &quot;C/C&quot;, &quot;G/G&quot;], 
+        &quot;003P2.AD&quot;:[&quot;3,0&quot;, &quot;8,0&quot;, &quot;10,0&quot;, &quot;8,0&quot;, &quot;5,0&quot;],
+        &quot;003P2.DP&quot;:[&quot;3&quot;, &quot;8&quot;, &quot;10&quot;, &quot;8&quot;, &quot;5&quot;]
+       }
+dfg = pd.DataFrame(data)
+</code></pre>
+<p>dfg</p>
+<p>The dataframe looks as follows:</p>
+<pre><code>CHROM   Sample  001C1.GT    001C1.AD    001C1.DP    001P1.GT    001P1.AD    001P1.DP    001P2.GT    001P2.AD    001P2.DP    003C.GT 003C.AD 003C.DP 003P1.GT    003P1.AD    003P1.DP    003P2.GT    003P2.AD    003P2.DP
+0   chr1    003C    C/C         2,0         2           C/C         1,0         1           C/C         5,0         5           C/C     2,0     2       C/C         1,0         1           C/C         3,0         3
+1   chr1    001C1   G/G         8,0         8           G/G         9,0         9           G/G         2,0         2           G/G     7,0     7       G/G         4,0         4           G/G         8,0         8
+2   chr2    001C1   G/A         1,2         3           G/G         3,0         3           G/G         3,0         3           G/G     4,0     4       G/G         2,0         2           G/G         10,0        10
+3   chr1    001C    C/C         1,0         1           C/C         3,0         3           C/C         5,0         5           C/C     13,0    13      C/C         7,0         7           C/C         8,0         8
+4   chr7    003C    G/G         2,0         2           G/G         8,0         8           G/G         7,0         7           G/G     6,0     6       G/G         7,0         7           G/G         5,0         5
+</code></pre>
+<p>I want to shrink the data such that column name contains only row values
+expected output:</p>
+<pre><code>CHROM   Sample  C.GT    C.AD    C.DP    P1.GT   P1.AD   P1.DP   P2.GT   P2.AD   P2.DP
+chr1    003C    C/C     2,0     2       C/C     1,0     1       C/C     3,0     3
+chr1    001C1   G/G     8,0     8       G/G     9,0     9       G/G     2,0     2
+chr2    001C1   G/A     1,2     3       G/G     3,0     3       G/G     3,0     3
+chr1    001C    C/C     1,0     1       C/C     3,0     3       C/C     5,0     5
+chr7    003C    G/G     6,0     6       G/G     7,0     7       G/G     5,0     5
+</code></pre>
+<p>I want to keep only the values from column that partially matches dfg['Sample'].</p>
+<p>in the first case: Sample is <code>003C</code> . So I wanted to extract the values from column that matches 003: ie  columns <code>003C.GT</code>, <code>003C.AD</code>, <code>003C.DP</code>, <code>003P1.GT</code>,<code>003P1.AD</code>, <code>003P1.DP</code>, <code>003P2.GT</code>,<code>003P2.AD</code>,<code>003P2.DP</code></p>
+<p>such that first row look like:</p>
+<pre><code>CHROM   Sample  C.GT    C.AD    C.DP    P1.GT   P1.AD   P1.DP   P2.GT   P2.AD   P2.DP
+chr1    003C    C/C     2,0     2       C/C     1,0     1       C/C     3,0     3
+</code></pre>
+<p>Similary, I have Sample as 001, 010, 011, 033, 044, 003 etc, about 300 samples</p>
+"
+"How to get count of items in the columns of dataframe?","<p>I have dataframe as follows:</p>
+<pre><code>data2 = {
+    'values': ['associated with autism spectrum disorder', 'Autism', 'High-functioning autism'],
+    'Genes': ['GRIN3A, PRKAG1, GRIN2', 'CNTNAP2', 'CNTNAP2'],
+    'Group':['Autism', 'Autism', 'Autism']
+}
+df2 = pd.DataFrame(data2)
+</code></pre>
+<p>df2</p>
+<pre><code>    values                                      Genes                   Group
+0   associated with autism spectrum disorder    GRIN3A, PRKAG1, GRIN2   Autism
+1   Autism                                      CNTNAP2                 Autism
+2   High-functioning autism                     CNTNAP2                 Autism
+</code></pre>
+<p>I want to get the count of items in df['Genes'].
+i tried:</p>
+<pre><code>data2 = {
+    'values': ['associated with autism spectrum disorder', 'Autism', 'High-functioning autism'],
+    'Genes': ['GRIN3A, PRKAG1, GRIN2', 'CNTNAP2', 'CNTNAP2'],
+    'Group':['Autism', 'Autism', 'Autism']
+}
+df2 = pd.DataFrame(data2)
+</code></pre>
+<p>df2</p>
+<p>but i get following results with unwanted data in it:</p>
+<pre><code>Group    Genes                                  Count
+Autism   [GRIN3, A, PRKAG1, GRIN2, C, CNTNAP2]  6
+</code></pre>
+<p><a href=""https://stackoverflow.com/questions/68569196/how-to-get-unique-elements-and-their-counts-in-each-category-from-a-dataframe/68569335#68569335"">link</a>
+Count is supposed to be 4 but I get 6 and <code>A</code> and <code>C</code> in the data.</p>
+"
+"","<pre><code>dfs= df2.groupby('Group').agg({'Genes':lambda x: set(x.str.split(', ').explode())}).reset_index()
+dfs['count'] = dfs['Genes'].apply(len)
+</code></pre>
+<p>dfs</p>
+<pre><code>    Group    Genes                              count
+0   Autism   {CNTNAP2, GRIN2, GRIN3A, PRKAG1}   4
+</code></pre>
+"
+"How to find the frquency of items in a given dataframe considering specific subgroups?","<p>I have two dataframes: <code>df1</code></p>
+<pre><code>groups = {'Items': [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;, &quot;d&quot;, &quot;d&quot;, &quot;x&quot;, &quot;y&quot;, &quot;z&quot;, &quot;p&quot;, &quot;q&quot;, &quot;m&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;y&quot;, &quot;z&quot;, &quot;o&quot;, &quot;d&quot;],
+          'Groups': [&quot;c11d&quot;, &quot;c11d&quot;, &quot;c22c&quot;, &quot;c22c&quot;, &quot;c22c&quot;, &quot;c22c&quot;, &quot;dp1&quot;, &quot;dp1&quot;, &quot;dp3&quot;, &quot;dp3&quot;, &quot;dp1&quot;, &quot;dp1&quot;, &quot;lp1&quot;,
+                    &quot;lp2&quot;, &quot;lp2&quot;, &quot;lp2&quot;, &quot;lp1&quot;, &quot;lp1&quot;, &quot;rk1&quot;, &quot;rk1&quot;],
+          'Tags': [&quot;banana&quot;, &quot;banana&quot;, &quot;banana&quot;, &quot;banana&quot;, &quot;banana&quot;, &quot;banana&quot;, &quot;orange&quot;, &quot;orange&quot;, &quot;orange&quot;, &quot;orange&quot;,
+                   &quot;orange&quot;, &quot;orange&quot;, &quot;lemon&quot;, &quot;lemon&quot;, &quot;lemon&quot;, &quot;lemon&quot;, &quot;lemon&quot;, &quot;lemon&quot;, &quot;apple&quot;, &quot;apple&quot;]
+}
+df1 = pd.DataFrame(groups)
+</code></pre>
+<p>df1</p>
+<pre><code>    Items   Groups  Tags
+0   a       c11d    banana
+1   b       c11d    banana
+2   c       c22c    banana
+3   c       c22c    banana
+4   d       c22c    banana
+5   d       c22c    banana
+6   x       dp1     orange
+7   y       dp1     orange
+8   z       dp3     orange
+9   p       dp3     orange
+10  q       dp1     orange
+11  m       dp1     orange
+12  a       lp1     lemon
+13  b       lp2     lemon
+14  c       lp2     lemon
+15  d       lp2     lemon
+16  y       lp1     lemon
+17  z       lp1     lemon
+18  o       rk1     apple
+19  d       rk1     apple
+</code></pre>
+<p>then <code>df2</code></p>
+<pre><code>terms = {'Groups': [&quot;banana&quot;, &quot;apple&quot;, &quot;orange&quot;, &quot;lemon&quot;],
+          '1C': [&quot;a,b,c,d&quot;, &quot;b,d,z,y&quot;, &quot;c,x,y,p&quot;, &quot;p,q&quot;],
+          '2C': [&quot;m,n,a&quot;, &quot;o,c,d&quot;, &quot;p,r,d&quot;, &quot;&quot;]
+}
+df2 = pd.DataFrame(terms)
+</code></pre>
+<p>df2</p>
+<pre><code>    Groups  1C        2C
+0   banana  a,b,c,d   m,n,a
+1   apple   b,d,z,y   o,c,d
+2   orange  c,x,y,p   p,r,d
+3   lemon   p,q 
+</code></pre>
+<p>I want to map items of each column of <code>df2</code> based on <code>Groups</code> to the other dataframe <code>df1</code> and find the frequency of tags by items in <code>df2</code> which is subdivided by groups.</p>
+<p>The expected output is:</p>
+<pre><code>Groups  1C      1C.Freq         2C      2C.Freq
+banana  a,b,c,d c11d=2, c22c=4  m,n,a   c11d=1, c22c=0
+apple   b,d,z,y rk1=1           o,c,d   rk1=2
+orange  c,x,y,p dp1=2, dp3=1    p,r,d   dp1=0, dp3=1
+lemon   p,q,z   lp1=1,lp2=0             lp1=0,lp2=0
+</code></pre>
+<p>Sorry for my langugage. Any help appreciated. Thanks :)
+The real dataframe has more tags and columns.</p>
+"
+"How to sort the values within a column based on the values assigned to it?","<p>I have a dataframe as follows: The values in the column are separated by <code>;</code> and each item is assigned with numeric value. I want to sort them based on the numeric value.</p>
+<pre><code>ab = {
+    'Category': ['AD', 'AG'],
+    'data1': ['a, b=4; b=3; dk=1; kc/d2=8', 'km=4; df,md=8; lko=10; cog=12'],
+    'data2': ['a=9; kd=1; mn=1; fg=3', 'kl=6; md=1; jhk=3, b &amp;j=4; ghg=7']
+}
+df1 = pd.DataFrame(ab)
+</code></pre>
+<p>df1</p>
+<pre><code>    Category    data1                         data2
+0   AD          a, b=4; b=3; dk=1; kc/d2=8    a=9; kd=1; mn=1; fg=3
+1   AG          km=4; df,md=8; lko=10; cog=12 kl=6; md=1; jhk=3, b &amp;j=4; ghg=7
+</code></pre>
+<p>I want to sort the items in each columns based on the value assigned to it.
+the expected output is:</p>
+<pre><code>    Category    data1                            data2
+0   AD          kc/d2=8; a, b=4; b=3; dk=1       a=9; fg=3; kd=1; mn=1;
+1   AG          cog=12; lko=10; df,md=8; km=4    ghg=7; kl=6; b &amp;j=4; jhk=3; md=1
+</code></pre>
+"
+"How to assign tags to new column based on the different row values in the dataframe?","<p>I have a dataframe as follows:</p>
+<pre><code>a=[&quot;003C&quot;, &quot;003P1&quot;, &quot;003P1&quot;, &quot;003P1&quot;, &quot;004C&quot;, &quot;004P1&quot;, &quot;004P2&quot;, &quot;003C&quot;, &quot;003P2&quot;, &quot;003P1&quot;, &quot;003C&quot;, &quot;003P1&quot;, &quot;003P2&quot;, &quot;003C&quot;, &quot;003P1&quot;, &quot;004C&quot;, &quot;004P2&quot;, &quot;001C&quot;, &quot;001P1&quot;]
+b=[&quot;chr18&quot;, &quot;chr20&quot;, &quot;chr8&quot;, &quot;chr8&quot;, &quot;chr11&quot;, &quot;chr11&quot;, &quot;chr11&quot;, &quot;chr11&quot;, &quot;chr11&quot;, &quot;chr11&quot;, &quot;chr1&quot;, &quot;chr1&quot;, &quot;chr1&quot;, &quot;chr1&quot;, &quot;chr1&quot;, &quot;chr11&quot;, &quot;chr11&quot;, &quot;chr9&quot;, &quot;chr9&quot;]
+c=[48399,145653,244695,244695,1163940,1163940,1163940,5986513,5986513,5986513,248650751,248650751,248650751,125895,125895,2587895,2587895,14587952,14587952]
+d=[&quot;C&quot;, &quot;G&quot;, &quot;C&quot;, &quot;C&quot;, &quot;C&quot;, &quot;C&quot;, &quot;C&quot;, &quot;G&quot;, &quot;G&quot;, &quot;G&quot;, &quot;T&quot;, &quot;T&quot;, &quot;T&quot;, &quot;T&quot;, &quot;T&quot;, &quot;C&quot;, &quot;C&quot;, &quot;T&quot;, &quot;T&quot;]
+e=[&quot;A&quot;, &quot;T&quot;, &quot;A&quot;, &quot;A&quot;, &quot;G&quot;, &quot;G&quot;, &quot;G&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;G&quot;, &quot;G&quot;, &quot;C&quot;, &quot;C&quot;]
+#Make dataframe
+df = pd.DataFrame({'Sample':a, 'CHROM':b, 'POS':c, 'REF':d, 'ALT':e})
+</code></pre>
+<p>df</p>
+<pre><code>    Sample  CHROM   POS         REF  ALT
+0   003C    chr18   48399       C    A
+1   003P1   chr20   145653      G    T
+2   003P1   chr8    244695      C    A
+3   003P1   chr8    244695      C    A
+4   004C    chr11   1163940     C    G
+5   004P1   chr11   1163940     C    G
+6   004P2   chr11   1163940     C    G
+7   003C    chr11   5986513     G    A
+8   003P2   chr11   5986513     G    A
+9   003P1   chr11   5986513     G    A
+10  003C    chr1    248650751   T    A
+11  003P1   chr1    248650751   T    A
+12  003P2   chr1    248650751   T    A
+13  003C    chr1    125895      T    A
+14  003P1   chr1    125895      T    A
+15  004C    chr11   2587895     C    G
+16  004P2   chr11   2587895     C    G
+17  001C    chr9    14587952    T   C
+18  001P1   chr9    14587952    T   C
+</code></pre>
+<p>I wanted to extract dataframe that matches 'CHROM' 'POS' 'REF' 'ALT' for df['Sample'] with C common with P1 or P2 or P1 &amp; P2. For example 003C : has its corrsponding 003P1 or 003P2 with with all matching values 'CHROM' 'POS' 'REF' 'ALT' see index 7,8,9 and 13,14 and 10,11,12. I wanted to extract them all: I was to do perform this using following code:</p>
+<pre><code>c = ['CHROM', 'POS', 'REF', 'ALT', 'INT']
+df[['INT','STR']] = df['Sample'].str.extract(r'(\d+)(.*)')
+
+m  = df['STR'].isin(['C', 'P1', 'P2'])
+m1 = df['STR'].eq('C').groupby([*df[c].values.T]).transform('any')
+m2 = df['STR'].mask(~m).groupby([*df[c].values.T]).transform('nunique').ge(2)
+
+df = df[m &amp; m1 &amp; m2].sort_values('POS', ignore_index=True).drop(['INT', 'STR'], 1)
+</code></pre>
+<p>I want to find out the <code>Sample</code> containing <code>C</code> is derived from <code>P1</code> or <code>P2</code> or both. The expected output is :</p>
+<pre><code>Sample  CHROM   POS         REF ALT DERIVE
+003C    chr18   48399       C   A   
+003C    chr1    125895      T   A   P1
+003P1   chr1    125895      T   A   
+003P1   chr20   145653      G   T   
+003P1   chr8    244695      C   A   
+003P1   chr8    244695      C   A   
+004C    chr11   1163940     C   G   BOTH
+004P1   chr11   1163940     C   G   
+004P2   chr11   1163940     C   G   
+004C    chr11   2587895     C   G   P2
+004P2   chr11   2587895     C   G   
+003C    chr11   5986513     G   A   BOTH
+003P2   chr11   5986513     G   A   
+003P1   chr11   5986513     G   A   
+001C    chr9    14587952    T   C     P1
+001P1   chr9    14587952    T   C   
+003C    chr1    248650751   T   A   BOTH
+003P1   chr1    248650751   T   A   
+003P2   chr1    248650751   T   A   
+</code></pre>
+"
+"","<p>You can use <code>isin</code> function:</p>
+<pre><code>df3 = df.mask(df.isin(df2['Remove'].values), '')
+df3
+
+    Title   Items   Item2   Item3
+0   Ak1             K   
+1   Ak2     B       B       K
+2   Ak3             O       D
+3   Ak4         
+4   Ak5         
+5   Ak6     K       K       K
+6   Ak7     L               L
+7   Ak8             F           
+</code></pre>
+"
+"How to create Venn digaram for 8 groups using R?","<p>I used following code to generate the sets:</p>
+<pre><code>H=list('ASD'=c(&quot;SCN3A&quot;, &quot;TSC2&quot;, &quot;RASSF8&quot;, &quot;XDH&quot;, &quot;CNTN5&quot;, &quot;CHD7&quot;, &quot;DPYD&quot;, &quot;BUB1&quot;, &quot;DPP4&quot;, &quot;AMPD1&quot;, &quot;ARID4A&quot;, &quot;QSER1&quot;, &quot;OCA2&quot;, &quot;GPR141&quot;, &quot;DNAH9&quot;, &quot;LOXHD1&quot;, &quot;SETX&quot;, &quot;GSTP1&quot;, &quot;SLC6A15&quot;, &quot;ASTN1&quot;, &quot;CACNA1D&quot;, &quot;WFS1&quot;, &quot;KCNC1&quot;, &quot;TPRA1&quot;, &quot;NBAS&quot;, &quot;LAMB1&quot;, &quot;TSNARE1&quot;, &quot;GABRB3&quot;, &quot;PAG1&quot;, &quot;SOS1&quot;, &quot;LHFPL4&quot;, &quot;KMT2C&quot;, &quot;GATM&quot;, &quot;NPTX2&quot;, &quot;ANK3&quot;, &quot;SH3TC2&quot;, &quot;CLPP&quot;, &quot;TP53BP1&quot;, &quot;EBF4&quot;, &quot;ANO1&quot;, &quot;DNAJC10&quot;, &quot;TTC25&quot;, &quot;NDUFB7&quot;, &quot;PCSK1&quot;, &quot;ROBO3&quot;, &quot;MYO9A&quot;, &quot;RPS23&quot;, &quot;ZNF292&quot;, &quot;CRBN&quot;, &quot;HIVEP2&quot;, &quot;CYP1B1&quot;, &quot;KCNE2&quot;, &quot;NRP2&quot;, &quot;ADSL&quot;, &quot;XIRP2&quot;, &quot;SMARCA4&quot;, &quot;HDAC2&quot;, &quot;JAK2&quot;, &quot;ATP9B&quot;, &quot;ESR1&quot;, &quot;MDN1&quot;, &quot;CTNNA2&quot;, &quot;CNTNAP2&quot;, &quot;SPTB&quot;, &quot;ACY1&quot;, &quot;CEP290&quot;, &quot;WNT2&quot;, &quot;IQGAP3&quot;, &quot;CACNG3&quot;, &quot;CACNA1H&quot;, &quot;FOXN1&quot;, &quot;SPAST&quot;, &quot;ADCY1&quot;, &quot;IGF2&quot;, &quot;RNF4&quot;, &quot;CTTNBP2&quot;, &quot;TMF1&quot;, &quot;CPT1A&quot;, &quot;TENM3&quot;, &quot;RABGGTA&quot;, &quot;MBD3&quot;, &quot;CCDC18&quot;, &quot;SMG1&quot;, &quot;SYNE1&quot;, &quot;PITX3&quot;, &quot;HMGA2&quot;, &quot;PDE6C&quot;, &quot;CTU2&quot;, &quot;PNPLA7&quot;, &quot;PIEZO1&quot;, &quot;MAP2&quot;, &quot;MCF2L&quot;, &quot;PRF1&quot;, &quot;VWA8&quot;, &quot;LRP2&quot;, &quot;RYR3&quot;, &quot;IPO9&quot;, &quot;DIXDC1&quot;, &quot;CNTNAP5&quot;, &quot;ELP4&quot;, &quot;LRRN1&quot;, &quot;TRIO&quot;, &quot;SACS&quot;, &quot;ASIC2&quot;, &quot;KIF1B&quot;, &quot;AXIN2&quot;, &quot;SORL1&quot;, &quot;DLG2&quot;, &quot;VPS13C&quot;, &quot;F2RL1&quot;, &quot;NRP1&quot;, &quot;LAMA1&quot;, &quot;LARP1&quot;, &quot;SDK1&quot;, &quot;LAMC2&quot;, &quot;LSG1&quot;, &quot;EP300&quot;, &quot;DGCR6L&quot;, &quot;TSHB&quot;, &quot;APC&quot;, &quot;TENM4&quot;, &quot;IGSF21&quot;),
+         'Epilepsy'=c(&quot;ADCY1&quot;, &quot;ADSL&quot;, &quot;ANK3&quot;, &quot;APC&quot;, &quot;ASIC2&quot;, &quot;ASTN1&quot;, &quot;ATP9B&quot;, &quot;AXIN2&quot;, &quot;BUB1&quot;, &quot;CACNA1D&quot;, &quot;CACNA1H&quot;, &quot;CACNG3&quot;, &quot;CEP290&quot;, &quot;CLPP&quot;, &quot;CNTN5&quot;, &quot;CNTNAP2&quot;, &quot;CNTNAP5&quot;, &quot;CTNNA2&quot;, &quot;CTU2&quot;, &quot;DGCR6L&quot;, &quot;DLG2&quot;, &quot;DNAJC10&quot;, &quot;ELP4&quot;, &quot;EP300&quot;, &quot;GABRB3&quot;, &quot;HDAC2&quot;, &quot;HMGA2&quot;, &quot;IGSF21&quot;, &quot;IPO9&quot;, &quot;IQGAP3&quot;, &quot;JAK2&quot;, &quot;KCNC1&quot;, &quot;KCNE2&quot;, &quot;KIF1B&quot;, &quot;LAMB1&quot;, &quot;LAMC2&quot;, &quot;LARP1&quot;, &quot;LHFPL4&quot;, &quot;MCF2L&quot;, &quot;MYO9A&quot;, &quot;NDUFB7&quot;, &quot;NRP2&quot;, &quot;RABGGTA&quot;, &quot;RYR3&quot;, &quot;SACS&quot;, &quot;SCN3A&quot;, &quot;SETX&quot;, &quot;SMARCA4&quot;, &quot;SMG1&quot;, &quot;SORL1&quot;, &quot;SPAST&quot;, &quot;SPTB&quot;, &quot;TMF1&quot;, &quot;TP53BP1&quot;, &quot;TPRA1&quot;, &quot;TRIO&quot;, &quot;TSC2&quot;, &quot;TSHB&quot;, &quot;VPS13C&quot;, &quot;WFS1&quot;, &quot;XDH&quot;, &quot;ZNF292&quot;, &quot;ABCA1&quot;, &quot;ABCG5&quot;, &quot;ACP2&quot;, &quot;ADCY6&quot;, &quot;ADGRA3&quot;, &quot;ADGRV1&quot;, &quot;AGA&quot;, &quot;AGRN&quot;, &quot;ALG3&quot;, &quot;ANK2&quot;, &quot;ANKRD44&quot;, &quot;AP5Z1&quot;, &quot;ARAP1&quot;, &quot;ARHGEF11&quot;, &quot;ASCC3&quot;, &quot;ASPM&quot;, &quot;ATRN&quot;, &quot;AURKB&quot;, &quot;BRINP2&quot;, &quot;BRSK2&quot;, &quot;CAPN15&quot;, &quot;CAPN2&quot;, &quot;CC2D2A&quot;, &quot;CD36&quot;, &quot;CDX1&quot;, &quot;CHAT&quot;, &quot;CHM&quot;, &quot;CHTF18&quot;, &quot;CLCN2&quot;, &quot;CLCN7&quot;, &quot;CLEC12A&quot;, &quot;COG5&quot;, &quot;COG6&quot;, &quot;COL12A1&quot;, &quot;COL17A1&quot;, &quot;COL28A1&quot;, &quot;COL6A2&quot;, &quot;COQ3&quot;, &quot;CYBB&quot;, &quot;DBNL&quot;, &quot;DBR1&quot;, &quot;DEAF1&quot;, &quot;DGKQ&quot;, &quot;DHX29&quot;, &quot;DMXL1&quot;, &quot;DMXL2&quot;, &quot;DNAH12&quot;, &quot;DOCK7&quot;, &quot;DOLK&quot;, &quot;DSG4&quot;, &quot;DZIP1&quot;, &quot;EFHC1&quot;, &quot;EPHA7&quot;, &quot;EPHB1&quot;, &quot;EPHB3&quot;, &quot;ESYT1&quot;, &quot;EXOC7&quot;, &quot;F13A1&quot;, &quot;F5&quot;, &quot;FAH&quot;, &quot;FARP1&quot;, &quot;FASN&quot;, &quot;FAT1&quot;, &quot;FERMT1&quot;, &quot;FGFR3&quot;, &quot;FLNB&quot;, &quot;FLRT1&quot;, &quot;FMNL1&quot;, &quot;FN1&quot;, &quot;FOLR1&quot;, &quot;FZD4&quot;, &quot;GAA&quot;, &quot;GAK&quot;, &quot;GALC&quot;, &quot;GANAB&quot;, &quot;GLB1&quot;, &quot;GM2A&quot;, &quot;GNA14&quot;, &quot;GOSR2&quot;, &quot;GPC1&quot;, &quot;GSS&quot;, &quot;GTPBP4&quot;, &quot;HEATR1&quot;, &quot;HGS&quot;, &quot;HIPK2&quot;, &quot;HSPA13&quot;, &quot;HTR2B&quot;, &quot;INO80E&quot;, &quot;KALRN&quot;, &quot;KCNH2&quot;, &quot;KCNJ16&quot;, &quot;KIAA0586&quot;, &quot;KRIT1&quot;, &quot;LAMB2&quot;, &quot;LMAN1&quot;, &quot;LTBP3&quot;, &quot;MASTL&quot;, &quot;MED17&quot;, &quot;METTL25&quot;, &quot;MGAT5B&quot;, &quot;MPL&quot;, &quot;MRPL24&quot;, &quot;MRPS27&quot;, &quot;MSX2&quot;, &quot;MUS81&quot;, &quot;NALCN&quot;, &quot;NEB&quot;, &quot;NFE2L1&quot;, &quot;NMBR&quot;, &quot;NOL11&quot;, &quot;NUCB1&quot;, &quot;OBSL1&quot;, &quot;OGDHL&quot;, &quot;OGFOD2&quot;, &quot;PARP1&quot;, &quot;PCCB&quot;, &quot;PDGFRA&quot;, &quot;PDYN&quot;, &quot;PFAS&quot;, &quot;PFKFB3&quot;, &quot;PLEC&quot;, &quot;PLOD2&quot;, &quot;PNKD&quot;, &quot;PNPO&quot;, &quot;POLD1&quot;, &quot;POLE&quot;, &quot;POLL&quot;, &quot;PPAT&quot;, &quot;PRDX3&quot;, &quot;PSEN2&quot;, &quot;PTCH1&quot;, &quot;PTK2B&quot;, &quot;RAB5A&quot;, &quot;RAD54B&quot;, &quot;RELB&quot;, &quot;RHOT2&quot;, &quot;RIMS2&quot;, &quot;RTN4IP1&quot;, &quot;SAE1&quot;, &quot;SCAPER&quot;, &quot;SCN1B&quot;, &quot;SCN5A&quot;, &quot;SEC23IP&quot;, &quot;SERPINE2&quot;, &quot;SGCB&quot;, &quot;SIGLEC1&quot;, &quot;SLC18A3&quot;, &quot;SLC26A4&quot;, &quot;SLC2A1&quot;, &quot;SLC4A1&quot;, &quot;SLC4A3&quot;, &quot;SLITRK6&quot;, &quot;SPG11&quot;, &quot;STARD13&quot;, &quot;STT3A&quot;, &quot;SYF2&quot;, &quot;SYNJ1&quot;, &quot;SZT2&quot;, &quot;TECPR2&quot;, &quot;TES&quot;, &quot;TMEM67&quot;, &quot;TNK2&quot;, &quot;TNS1&quot;, &quot;TNS3&quot;, &quot;TRAP1&quot;, &quot;TRAPPC11&quot;, &quot;TRAPPC8&quot;, &quot;TRIP10&quot;, &quot;TRPM2&quot;, &quot;TRPM3&quot;, &quot;TRPV1&quot;, &quot;TUBGCP6&quot;, &quot;TYW1&quot;, &quot;UNC13B&quot;, &quot;USP45&quot;, &quot;VCP&quot;, &quot;WDR62&quot;, &quot;WWOX&quot;, &quot;YAP1&quot;, &quot;ZBTB48&quot;, &quot;ZFHX4&quot;, &quot;ZW10&quot;),
+         'Intellectual'=c(&quot;YAP1&quot;, &quot;TSC2&quot;, &quot;FMNL1&quot;, &quot;MADD&quot;, &quot;KRIT1&quot;, &quot;TNK2&quot;, &quot;NUP155&quot;, &quot;COG6&quot;, &quot;TRAPPC8&quot;, &quot;IPO9&quot;, &quot;CCT8&quot;, &quot;ZFYVE16&quot;, &quot;FAT1&quot;, &quot;SLC37A1&quot;, &quot;KAT6B&quot;, &quot;WWOX&quot;, &quot;PTK2B&quot;, &quot;CNTNAP5&quot;, &quot;HEATR1&quot;, &quot;TRAPPC11&quot;, &quot;ARID4A&quot;, &quot;ADGRV1&quot;, &quot;GPC1&quot;, &quot;AURKB&quot;, &quot;TTC39B&quot;, &quot;GSS&quot;, &quot;GANAB&quot;, &quot;RFWD3&quot;, &quot;CUL9&quot;, &quot;SAE1&quot;, &quot;CACNG3&quot;, &quot;SMC4&quot;, &quot;ASIC2&quot;, &quot;SYF2&quot;, &quot;PFAS&quot;, &quot;GAK&quot;, &quot;METTL25&quot;, &quot;OGDHL&quot;, &quot;RAB5A&quot;, &quot;VPS13C&quot;, &quot;FGFR3&quot;, &quot;KCNC1&quot;, &quot;DDOST&quot;, &quot;CTNND1&quot;, &quot;ATRN&quot;, &quot;UNC13B&quot;, &quot;FASN&quot;, &quot;MYO18A&quot;, &quot;TMF1&quot;, &quot;CRBN&quot;, &quot;FLNB&quot;, &quot;LARP1&quot;, &quot;RCC2&quot;, &quot;MASTL&quot;, &quot;ADGRA3&quot;, &quot;SCAPER&quot;, &quot;SZT2&quot;, &quot;LRP4&quot;, &quot;SMG1&quot;, &quot;SYNE1&quot;, &quot;ADCY6&quot;, &quot;RNGTT&quot;, &quot;EP300&quot;, &quot;ARAP1&quot;, &quot;ANKRD44&quot;, &quot;VPS39&quot;, &quot;DGCR6L&quot;, &quot;STT3A&quot;, &quot;COG5&quot;, &quot;NFE2L1&quot;, &quot;SLC7A2&quot;, &quot;ASCC3&quot;, &quot;LMAN1&quot;, &quot;OBSL1&quot;, &quot;KIF20B&quot;, &quot;PNPLA7&quot;),
+         'Schizophrenia'=c(&quot;CRB1&quot;, &quot;FBXW4&quot;, &quot;CNTN5&quot;, &quot;CHM&quot;, &quot;DPYD&quot;, &quot;BUB1&quot;, &quot;DPP4&quot;, &quot;ADGRV1&quot;, &quot;GPC1&quot;, &quot;DLD&quot;, &quot;RBM19&quot;, &quot;ITIH1&quot;, &quot;ADCY7&quot;, &quot;KCNC1&quot;, &quot;ACBD5&quot;, &quot;ELF1&quot;, &quot;TSNARE1&quot;, &quot;GABRB3&quot;, &quot;TMEM182&quot;, &quot;STT3A&quot;, &quot;KMT2C&quot;, &quot;ANK3&quot;, &quot;SAMD4A&quot;, &quot;NALCN&quot;, &quot;PDLIM5&quot;, &quot;LIMA1&quot;, &quot;DYNC1I2&quot;, &quot;TMEM26&quot;, &quot;ANK2&quot;, &quot;GRIN3A&quot;, &quot;EPHB1&quot;, &quot;BRINP2&quot;, &quot;KALRN&quot;, &quot;MICAL2&quot;, &quot;TTLL6&quot;, &quot;ZNF292&quot;, &quot;SERPINB1&quot;, &quot;SCAPER&quot;, &quot;KCNS3&quot;, &quot;VAMP1&quot;, &quot;HDAC2&quot;, &quot;DLG1&quot;, &quot;CFAP58&quot;, &quot;JAK2&quot;, &quot;ESR1&quot;, &quot;EFCAB14&quot;, &quot;CNTNAP2&quot;, &quot;PENK&quot;, &quot;WWOX&quot;, &quot;GLT8D1&quot;, &quot;SFMBT2&quot;, &quot;EEFSEC&quot;, &quot;PDZD8&quot;, &quot;GALC&quot;, &quot;CACNG3&quot;, &quot;SPG7&quot;, &quot;ADCY1&quot;, &quot;CLDN10&quot;, &quot;TENM3&quot;, &quot;OTOS&quot;, &quot;CAPN2&quot;, &quot;LRP4&quot;, &quot;SYNE1&quot;, &quot;HMGA2&quot;, &quot;APOL4&quot;, &quot;ARAP1&quot;, &quot;DOPEY1&quot;, &quot;EPN2&quot;, &quot;MCF2L&quot;, &quot;PLAA&quot;, &quot;RYR3&quot;, &quot;CNTNAP5&quot;, &quot;POLE&quot;, &quot;TRIO&quot;, &quot;RAB11FIP5&quot;, &quot;BNIP3L&quot;, &quot;RUNX1&quot;, &quot;AXIN2&quot;, &quot;KIF1B&quot;, &quot;DLG2&quot;, &quot;MAP3K9&quot;, &quot;CERCAM&quot;, &quot;VPS13C&quot;, &quot;MYO18B&quot;, &quot;NRP1&quot;, &quot;IRS1&quot;, &quot;MANEA&quot;, &quot;EP300&quot;, &quot;DGCR6L&quot;, &quot;TSHB&quot;, &quot;AASDHPPT&quot;, &quot;TRAPPC3&quot;, &quot;APC&quot;, &quot;TENM4&quot;),
+         'ADHD'=c(&quot;TSC2&quot;, &quot;CSMD2&quot;, &quot;ANK3&quot;, &quot;ASPM&quot;, &quot;CNTN5&quot;, &quot;TP53BP1&quot;, &quot;CNTNAP2&quot;, &quot;CHD7&quot;, &quot;GLT8D1&quot;, &quot;CNTNAP5&quot;, &quot;SFMBT2&quot;, &quot;MLH1&quot;, &quot;FLII&quot;, &quot;PTCH1&quot;, &quot;SPRED1&quot;, &quot;ARHGEF12&quot;, &quot;CHMP7&quot;, &quot;SVEP1&quot;, &quot;CREB5&quot;, &quot;MSH6&quot;, &quot;TTLL8&quot;, &quot;DLG2&quot;, &quot;MICAL2&quot;, &quot;DNAH3&quot;, &quot;ADGRA3&quot;, &quot;ACBD5&quot;, &quot;SYNE1&quot;, &quot;NUCB1&quot;, &quot;NRP2&quot;, &quot;TMEM182&quot;, &quot;STT3A&quot;, &quot;GNE&quot;, &quot;PAX5&quot;, &quot;TENM4&quot;),
+         'Biopolar Disoder'=c(&quot;CSMD2&quot;, &quot;ANK3&quot;, &quot;NUMB&quot;, &quot;CNTN5&quot;, &quot;CTNNA2&quot;, &quot;CNTNAP2&quot;, &quot;NALCN&quot;, &quot;RDH14&quot;, &quot;WWOX&quot;, &quot;GLT8D1&quot;, &quot;SFMBT2&quot;, &quot;SPRED1&quot;, &quot;ADAMTS14&quot;, &quot;TTC39B&quot;, &quot;SVEP1&quot;, &quot;COL28A1&quot;, &quot;PDZD8&quot;, &quot;GALC&quot;, &quot;SORL1&quot;, &quot;ITIH1&quot;, &quot;CLSPN&quot;, &quot;SLCO4A1&quot;, &quot;VPS13C&quot;, &quot;MYO18B&quot;, &quot;TTLL6&quot;, &quot;CRBN&quot;, &quot;NFATC2&quot;, &quot;SYNE1&quot;, &quot;INTS7&quot;, &quot;TMEM182&quot;, &quot;STT3A&quot;, &quot;WSCD1&quot;, &quot;KCNS3&quot;, &quot;PDGFRA&quot;),
+         'circadian'=c(&quot;YTHDC2&quot;, &quot;LRP1B&quot;, &quot;SAMD4A&quot;, &quot;VTA1&quot;, &quot;NALCN&quot;, &quot;F13A1&quot;, &quot;SLC4A1&quot;, &quot;TMEM26&quot;, &quot;ADAMTS14&quot;, &quot;COL28A1&quot;, &quot;RNF19A&quot;, &quot;BRINP2&quot;, &quot;TRHR&quot;, &quot;CCBE1&quot;, &quot;CACNA2D3&quot;, &quot;MYO18A&quot;, &quot;SLC26A7&quot;, &quot;FRAS1&quot;, &quot;EP300&quot;, &quot;GNE&quot;, &quot;LMAN1&quot;, &quot;NMBR&quot;, &quot;TGFBI&quot;, &quot;CHAT&quot;, &quot;HIPK2&quot;, &quot;SERPINE2&quot;, &quot;RELB&quot;, &quot;ARHGEF12&quot;, &quot;SETX&quot;, &quot;CACNA1D&quot;, &quot;ADCY7&quot;, &quot;NBAS&quot;, &quot;GPR83&quot;, &quot;LTBP3&quot;, &quot;GABRB3&quot;, &quot;HMBS&quot;, &quot;PSMA4&quot;, &quot;MADD&quot;, &quot;SIX3&quot;, &quot;EPHB1&quot;, &quot;GAK&quot;, &quot;SPRY4&quot;, &quot;ABCA13&quot;, &quot;SLC8A3&quot;, &quot;HIVEP2&quot;, &quot;FAH&quot;, &quot;ADCY6&quot;, &quot;MYLIP&quot;, &quot;NFE2L1&quot;, &quot;PRKAG1&quot;, &quot;HDAC2&quot;, &quot;TNS1&quot;, &quot;GSS&quot;, &quot;CACNA1H&quot;, &quot;POLL&quot;, &quot;CPT1A&quot;, &quot;CAPN2&quot;, &quot;PITX3&quot;, &quot;NFE2L3&quot;, &quot;PNPLA7&quot;, &quot;AGA&quot;, &quot;STX16&quot;, &quot;TNK2&quot;, &quot;PRF1&quot;, &quot;RYR3&quot;, &quot;DIXDC1&quot;, &quot;PSEN2&quot;, &quot;SREBF1&quot;, &quot;POLE&quot;, &quot;RAB11FIP5&quot;, &quot;KIF1B&quot;, &quot;RAB5A&quot;, &quot;NGB&quot;, &quot;ARHGEF11&quot;, &quot;SIX6&quot;, &quot;SDK1&quot;, &quot;AATK&quot;, &quot;CYP7A1&quot;, &quot;CUL9&quot;),
+         'dementia'=c(&quot;LMAN1&quot;, &quot;PRDX3&quot;, &quot;NPLOC4&quot;, &quot;PSEN2&quot;, &quot;ZFYVE16&quot;, &quot;CHAT&quot;, &quot;PENK&quot;, &quot;LTBP1&quot;, &quot;SNCAIP&quot;, &quot;NOL11&quot;, &quot;GANAB&quot;, &quot;DLD&quot;, &quot;SPG11&quot;, &quot;IGSF21&quot;, &quot;RNF19A&quot;, &quot;ASIC2&quot;, &quot;ASTN1&quot;, &quot;SORL1&quot;, &quot;SPRY4&quot;, &quot;VCP&quot;, &quot;TATDN1&quot;, &quot;RAB5A&quot;, &quot;VPS13C&quot;, &quot;GM2A&quot;, &quot;IRS1&quot;, &quot;PSMB4&quot;, &quot;NGB&quot;, &quot;F2RL1&quot;, &quot;RAB38&quot;, &quot;SMOX&quot;, &quot;PARP1&quot;, &quot;ABCC9&quot;, &quot;RPN2&quot;, &quot;CAPN2&quot;, &quot;GALNT7&quot;, &quot;SMG1&quot;, &quot;TBK1&quot;, &quot;MASP2&quot;, &quot;GNE&quot;, &quot;GTPBP4&quot;, &quot;CCT8&quot;, &quot;CD63&quot;, &quot;PSMA4&quot;, &quot;TUBA4A&quot;, &quot;CUL9&quot;)
+        )
+venn(H)
+</code></pre>
+<p>Throws me an error:</p>
+<blockquote>
+<p>Error in drawVennDiagram(data = counts, small = small, showSetLogicLabel = showSetLogicLabel, : Venn diagrams for  8  dimensions are not yet supported.</p>
+</blockquote>
+"
+"How to add count values in venn diagram for more than 6 sets?","<p>I used following code to generate the sets for more than 5 groups:</p>
+<pre><code>library(venneuler)
+
+H=list('ASD'=c(&quot;SCN3A&quot;, &quot;TSC2&quot;, &quot;RASSF8&quot;, &quot;XDH&quot;, &quot;CNTN5&quot;, &quot;CHD7&quot;, &quot;DPYD&quot;, &quot;BUB1&quot;, &quot;DPP4&quot;, &quot;AMPD1&quot;, &quot;ARID4A&quot;, &quot;QSER1&quot;, &quot;OCA2&quot;, &quot;GPR141&quot;, &quot;DNAH9&quot;, &quot;LOXHD1&quot;, &quot;SETX&quot;, &quot;GSTP1&quot;, &quot;SLC6A15&quot;, &quot;ASTN1&quot;, &quot;CACNA1D&quot;, &quot;WFS1&quot;, &quot;KCNC1&quot;, &quot;TPRA1&quot;, &quot;NBAS&quot;, &quot;LAMB1&quot;, &quot;TSNARE1&quot;, &quot;GABRB3&quot;, &quot;PAG1&quot;, &quot;SOS1&quot;, &quot;LHFPL4&quot;, &quot;KMT2C&quot;, &quot;GATM&quot;, &quot;NPTX2&quot;, &quot;ANK3&quot;, &quot;SH3TC2&quot;, &quot;CLPP&quot;, &quot;TP53BP1&quot;, &quot;EBF4&quot;, &quot;ANO1&quot;, &quot;DNAJC10&quot;, &quot;TTC25&quot;, &quot;NDUFB7&quot;, &quot;PCSK1&quot;, &quot;ROBO3&quot;, &quot;MYO9A&quot;, &quot;RPS23&quot;, &quot;ZNF292&quot;, &quot;CRBN&quot;, &quot;HIVEP2&quot;, &quot;CYP1B1&quot;, &quot;KCNE2&quot;, &quot;NRP2&quot;, &quot;ADSL&quot;, &quot;XIRP2&quot;, &quot;SMARCA4&quot;, &quot;HDAC2&quot;, &quot;JAK2&quot;, &quot;ATP9B&quot;, &quot;ESR1&quot;, &quot;MDN1&quot;, &quot;CTNNA2&quot;, &quot;CNTNAP2&quot;, &quot;SPTB&quot;, &quot;ACY1&quot;, &quot;CEP290&quot;, &quot;WNT2&quot;, &quot;IQGAP3&quot;, &quot;CACNG3&quot;, &quot;CACNA1H&quot;, &quot;FOXN1&quot;, &quot;SPAST&quot;, &quot;ADCY1&quot;, &quot;IGF2&quot;, &quot;RNF4&quot;, &quot;CTTNBP2&quot;, &quot;TMF1&quot;, &quot;CPT1A&quot;, &quot;TENM3&quot;, &quot;RABGGTA&quot;, &quot;MBD3&quot;, &quot;CCDC18&quot;, &quot;SMG1&quot;, &quot;SYNE1&quot;, &quot;PITX3&quot;, &quot;HMGA2&quot;, &quot;PDE6C&quot;, &quot;CTU2&quot;, &quot;PNPLA7&quot;, &quot;PIEZO1&quot;, &quot;MAP2&quot;, &quot;MCF2L&quot;, &quot;PRF1&quot;, &quot;VWA8&quot;, &quot;LRP2&quot;, &quot;RYR3&quot;, &quot;IPO9&quot;, &quot;DIXDC1&quot;, &quot;CNTNAP5&quot;, &quot;ELP4&quot;, &quot;LRRN1&quot;, &quot;TRIO&quot;, &quot;SACS&quot;, &quot;ASIC2&quot;, &quot;KIF1B&quot;, &quot;AXIN2&quot;, &quot;SORL1&quot;, &quot;DLG2&quot;, &quot;VPS13C&quot;, &quot;F2RL1&quot;, &quot;NRP1&quot;, &quot;LAMA1&quot;, &quot;LARP1&quot;, &quot;SDK1&quot;, &quot;LAMC2&quot;, &quot;LSG1&quot;, &quot;EP300&quot;, &quot;DGCR6L&quot;, &quot;TSHB&quot;, &quot;APC&quot;, &quot;TENM4&quot;, &quot;IGSF21&quot;),
+             'Epilepsy'=c(&quot;ADCY1&quot;, &quot;ADSL&quot;, &quot;ANK3&quot;, &quot;APC&quot;, &quot;ASIC2&quot;, &quot;ASTN1&quot;, &quot;ATP9B&quot;, &quot;AXIN2&quot;, &quot;BUB1&quot;, &quot;CACNA1D&quot;, &quot;CACNA1H&quot;, &quot;CACNG3&quot;, &quot;CEP290&quot;, &quot;CLPP&quot;, &quot;CNTN5&quot;, &quot;CNTNAP2&quot;, &quot;CNTNAP5&quot;, &quot;CTNNA2&quot;, &quot;CTU2&quot;, &quot;DGCR6L&quot;, &quot;DLG2&quot;, &quot;DNAJC10&quot;, &quot;ELP4&quot;, &quot;EP300&quot;, &quot;GABRB3&quot;, &quot;HDAC2&quot;, &quot;HMGA2&quot;, &quot;IGSF21&quot;, &quot;IPO9&quot;, &quot;IQGAP3&quot;, &quot;JAK2&quot;, &quot;KCNC1&quot;, &quot;KCNE2&quot;, &quot;KIF1B&quot;, &quot;LAMB1&quot;, &quot;LAMC2&quot;, &quot;LARP1&quot;, &quot;LHFPL4&quot;, &quot;MCF2L&quot;, &quot;MYO9A&quot;, &quot;NDUFB7&quot;, &quot;NRP2&quot;, &quot;RABGGTA&quot;, &quot;RYR3&quot;, &quot;SACS&quot;, &quot;SCN3A&quot;, &quot;SETX&quot;, &quot;SMARCA4&quot;, &quot;SMG1&quot;, &quot;SORL1&quot;, &quot;SPAST&quot;, &quot;SPTB&quot;, &quot;TMF1&quot;, &quot;TP53BP1&quot;, &quot;TPRA1&quot;, &quot;TRIO&quot;, &quot;TSC2&quot;, &quot;TSHB&quot;, &quot;VPS13C&quot;, &quot;WFS1&quot;, &quot;XDH&quot;, &quot;ZNF292&quot;, &quot;ABCA1&quot;, &quot;ABCG5&quot;, &quot;ACP2&quot;, &quot;ADCY6&quot;, &quot;ADGRA3&quot;, &quot;ADGRV1&quot;, &quot;AGA&quot;, &quot;AGRN&quot;, &quot;ALG3&quot;, &quot;ANK2&quot;, &quot;ANKRD44&quot;, &quot;AP5Z1&quot;, &quot;ARAP1&quot;, &quot;ARHGEF11&quot;, &quot;ASCC3&quot;, &quot;ASPM&quot;, &quot;ATRN&quot;, &quot;AURKB&quot;, &quot;BRINP2&quot;, &quot;BRSK2&quot;, &quot;CAPN15&quot;, &quot;CAPN2&quot;, &quot;CC2D2A&quot;, &quot;CD36&quot;, &quot;CDX1&quot;, &quot;CHAT&quot;, &quot;CHM&quot;, &quot;CHTF18&quot;, &quot;CLCN2&quot;, &quot;CLCN7&quot;, &quot;CLEC12A&quot;, &quot;COG5&quot;, &quot;COG6&quot;, &quot;COL12A1&quot;, &quot;COL17A1&quot;, &quot;COL28A1&quot;, &quot;COL6A2&quot;, &quot;COQ3&quot;, &quot;CYBB&quot;, &quot;DBNL&quot;, &quot;DBR1&quot;, &quot;DEAF1&quot;, &quot;DGKQ&quot;, &quot;DHX29&quot;, &quot;DMXL1&quot;, &quot;DMXL2&quot;, &quot;DNAH12&quot;, &quot;DOCK7&quot;, &quot;DOLK&quot;, &quot;DSG4&quot;, &quot;DZIP1&quot;, &quot;EFHC1&quot;, &quot;EPHA7&quot;, &quot;EPHB1&quot;, &quot;EPHB3&quot;, &quot;ESYT1&quot;, &quot;EXOC7&quot;, &quot;F13A1&quot;, &quot;F5&quot;, &quot;FAH&quot;, &quot;FARP1&quot;, &quot;FASN&quot;, &quot;FAT1&quot;, &quot;FERMT1&quot;, &quot;FGFR3&quot;, &quot;FLNB&quot;, &quot;FLRT1&quot;, &quot;FMNL1&quot;, &quot;FN1&quot;, &quot;FOLR1&quot;, &quot;FZD4&quot;, &quot;GAA&quot;, &quot;GAK&quot;, &quot;GALC&quot;, &quot;GANAB&quot;, &quot;GLB1&quot;, &quot;GM2A&quot;, &quot;GNA14&quot;, &quot;GOSR2&quot;, &quot;GPC1&quot;, &quot;GSS&quot;, &quot;GTPBP4&quot;, &quot;HEATR1&quot;, &quot;HGS&quot;, &quot;HIPK2&quot;, &quot;HSPA13&quot;, &quot;HTR2B&quot;, &quot;INO80E&quot;, &quot;KALRN&quot;, &quot;KCNH2&quot;, &quot;KCNJ16&quot;, &quot;KIAA0586&quot;, &quot;KRIT1&quot;, &quot;LAMB2&quot;, &quot;LMAN1&quot;, &quot;LTBP3&quot;, &quot;MASTL&quot;, &quot;MED17&quot;, &quot;METTL25&quot;, &quot;MGAT5B&quot;, &quot;MPL&quot;, &quot;MRPL24&quot;, &quot;MRPS27&quot;, &quot;MSX2&quot;, &quot;MUS81&quot;, &quot;NALCN&quot;, &quot;NEB&quot;, &quot;NFE2L1&quot;, &quot;NMBR&quot;, &quot;NOL11&quot;, &quot;NUCB1&quot;, &quot;OBSL1&quot;, &quot;OGDHL&quot;, &quot;OGFOD2&quot;, &quot;PARP1&quot;, &quot;PCCB&quot;, &quot;PDGFRA&quot;, &quot;PDYN&quot;, &quot;PFAS&quot;, &quot;PFKFB3&quot;, &quot;PLEC&quot;, &quot;PLOD2&quot;, &quot;PNKD&quot;, &quot;PNPO&quot;, &quot;POLD1&quot;, &quot;POLE&quot;, &quot;POLL&quot;, &quot;PPAT&quot;, &quot;PRDX3&quot;, &quot;PSEN2&quot;, &quot;PTCH1&quot;, &quot;PTK2B&quot;, &quot;RAB5A&quot;, &quot;RAD54B&quot;, &quot;RELB&quot;, &quot;RHOT2&quot;, &quot;RIMS2&quot;, &quot;RTN4IP1&quot;, &quot;SAE1&quot;, &quot;SCAPER&quot;, &quot;SCN1B&quot;, &quot;SCN5A&quot;, &quot;SEC23IP&quot;, &quot;SERPINE2&quot;, &quot;SGCB&quot;, &quot;SIGLEC1&quot;, &quot;SLC18A3&quot;, &quot;SLC26A4&quot;, &quot;SLC2A1&quot;, &quot;SLC4A1&quot;, &quot;SLC4A3&quot;, &quot;SLITRK6&quot;, &quot;SPG11&quot;, &quot;STARD13&quot;, &quot;STT3A&quot;, &quot;SYF2&quot;, &quot;SYNJ1&quot;, &quot;SZT2&quot;, &quot;TECPR2&quot;, &quot;TES&quot;, &quot;TMEM67&quot;, &quot;TNK2&quot;, &quot;TNS1&quot;, &quot;TNS3&quot;, &quot;TRAP1&quot;, &quot;TRAPPC11&quot;, &quot;TRAPPC8&quot;, &quot;TRIP10&quot;, &quot;TRPM2&quot;, &quot;TRPM3&quot;, &quot;TRPV1&quot;, &quot;TUBGCP6&quot;, &quot;TYW1&quot;, &quot;UNC13B&quot;, &quot;USP45&quot;, &quot;VCP&quot;, &quot;WDR62&quot;, &quot;WWOX&quot;, &quot;YAP1&quot;, &quot;ZBTB48&quot;, &quot;ZFHX4&quot;, &quot;ZW10&quot;),
+             'Intellectual'=c(&quot;YAP1&quot;, &quot;TSC2&quot;, &quot;FMNL1&quot;, &quot;MADD&quot;, &quot;KRIT1&quot;, &quot;TNK2&quot;, &quot;NUP155&quot;, &quot;COG6&quot;, &quot;TRAPPC8&quot;, &quot;IPO9&quot;, &quot;CCT8&quot;, &quot;ZFYVE16&quot;, &quot;FAT1&quot;, &quot;SLC37A1&quot;, &quot;KAT6B&quot;, &quot;WWOX&quot;, &quot;PTK2B&quot;, &quot;CNTNAP5&quot;, &quot;HEATR1&quot;, &quot;TRAPPC11&quot;, &quot;ARID4A&quot;, &quot;ADGRV1&quot;, &quot;GPC1&quot;, &quot;AURKB&quot;, &quot;TTC39B&quot;, &quot;GSS&quot;, &quot;GANAB&quot;, &quot;RFWD3&quot;, &quot;CUL9&quot;, &quot;SAE1&quot;, &quot;CACNG3&quot;, &quot;SMC4&quot;, &quot;ASIC2&quot;, &quot;SYF2&quot;, &quot;PFAS&quot;, &quot;GAK&quot;, &quot;METTL25&quot;, &quot;OGDHL&quot;, &quot;RAB5A&quot;, &quot;VPS13C&quot;, &quot;FGFR3&quot;, &quot;KCNC1&quot;, &quot;DDOST&quot;, &quot;CTNND1&quot;, &quot;ATRN&quot;, &quot;UNC13B&quot;, &quot;FASN&quot;, &quot;MYO18A&quot;, &quot;TMF1&quot;, &quot;CRBN&quot;, &quot;FLNB&quot;, &quot;LARP1&quot;, &quot;RCC2&quot;, &quot;MASTL&quot;, &quot;ADGRA3&quot;, &quot;SCAPER&quot;, &quot;SZT2&quot;, &quot;LRP4&quot;, &quot;SMG1&quot;, &quot;SYNE1&quot;, &quot;ADCY6&quot;, &quot;RNGTT&quot;, &quot;EP300&quot;, &quot;ARAP1&quot;, &quot;ANKRD44&quot;, &quot;VPS39&quot;, &quot;DGCR6L&quot;, &quot;STT3A&quot;, &quot;COG5&quot;, &quot;NFE2L1&quot;, &quot;SLC7A2&quot;, &quot;ASCC3&quot;, &quot;LMAN1&quot;, &quot;OBSL1&quot;, &quot;KIF20B&quot;, &quot;PNPLA7&quot;),
+             'Schizophrenia'=c(&quot;CRB1&quot;, &quot;FBXW4&quot;, &quot;CNTN5&quot;, &quot;CHM&quot;, &quot;DPYD&quot;, &quot;BUB1&quot;, &quot;DPP4&quot;, &quot;ADGRV1&quot;, &quot;GPC1&quot;, &quot;DLD&quot;, &quot;RBM19&quot;, &quot;ITIH1&quot;, &quot;ADCY7&quot;, &quot;KCNC1&quot;, &quot;ACBD5&quot;, &quot;ELF1&quot;, &quot;TSNARE1&quot;, &quot;GABRB3&quot;, &quot;TMEM182&quot;, &quot;STT3A&quot;, &quot;KMT2C&quot;, &quot;ANK3&quot;, &quot;SAMD4A&quot;, &quot;NALCN&quot;, &quot;PDLIM5&quot;, &quot;LIMA1&quot;, &quot;DYNC1I2&quot;, &quot;TMEM26&quot;, &quot;ANK2&quot;, &quot;GRIN3A&quot;, &quot;EPHB1&quot;, &quot;BRINP2&quot;, &quot;KALRN&quot;, &quot;MICAL2&quot;, &quot;TTLL6&quot;, &quot;ZNF292&quot;, &quot;SERPINB1&quot;, &quot;SCAPER&quot;, &quot;KCNS3&quot;, &quot;VAMP1&quot;, &quot;HDAC2&quot;, &quot;DLG1&quot;, &quot;CFAP58&quot;, &quot;JAK2&quot;, &quot;ESR1&quot;, &quot;EFCAB14&quot;, &quot;CNTNAP2&quot;, &quot;PENK&quot;, &quot;WWOX&quot;, &quot;GLT8D1&quot;, &quot;SFMBT2&quot;, &quot;EEFSEC&quot;, &quot;PDZD8&quot;, &quot;GALC&quot;, &quot;CACNG3&quot;, &quot;SPG7&quot;, &quot;ADCY1&quot;, &quot;CLDN10&quot;, &quot;TENM3&quot;, &quot;OTOS&quot;, &quot;CAPN2&quot;, &quot;LRP4&quot;, &quot;SYNE1&quot;, &quot;HMGA2&quot;, &quot;APOL4&quot;, &quot;ARAP1&quot;, &quot;DOPEY1&quot;, &quot;EPN2&quot;, &quot;MCF2L&quot;, &quot;PLAA&quot;, &quot;RYR3&quot;, &quot;CNTNAP5&quot;, &quot;POLE&quot;, &quot;TRIO&quot;, &quot;RAB11FIP5&quot;, &quot;BNIP3L&quot;, &quot;RUNX1&quot;, &quot;AXIN2&quot;, &quot;KIF1B&quot;, &quot;DLG2&quot;, &quot;MAP3K9&quot;, &quot;CERCAM&quot;, &quot;VPS13C&quot;, &quot;MYO18B&quot;, &quot;NRP1&quot;, &quot;IRS1&quot;, &quot;MANEA&quot;, &quot;EP300&quot;, &quot;DGCR6L&quot;, &quot;TSHB&quot;, &quot;AASDHPPT&quot;, &quot;TRAPPC3&quot;, &quot;APC&quot;, &quot;TENM4&quot;),
+             'ADHD'=c(&quot;TSC2&quot;, &quot;CSMD2&quot;, &quot;ANK3&quot;, &quot;ASPM&quot;, &quot;CNTN5&quot;, &quot;TP53BP1&quot;, &quot;CNTNAP2&quot;, &quot;CHD7&quot;, &quot;GLT8D1&quot;, &quot;CNTNAP5&quot;, &quot;SFMBT2&quot;, &quot;MLH1&quot;, &quot;FLII&quot;, &quot;PTCH1&quot;, &quot;SPRED1&quot;, &quot;ARHGEF12&quot;, &quot;CHMP7&quot;, &quot;SVEP1&quot;, &quot;CREB5&quot;, &quot;MSH6&quot;, &quot;TTLL8&quot;, &quot;DLG2&quot;, &quot;MICAL2&quot;, &quot;DNAH3&quot;, &quot;ADGRA3&quot;, &quot;ACBD5&quot;, &quot;SYNE1&quot;, &quot;NUCB1&quot;, &quot;NRP2&quot;, &quot;TMEM182&quot;, &quot;STT3A&quot;, &quot;GNE&quot;, &quot;PAX5&quot;, &quot;TENM4&quot;),
+             'Biopolar Disoder'=c(&quot;CSMD2&quot;, &quot;ANK3&quot;, &quot;NUMB&quot;, &quot;CNTN5&quot;, &quot;CTNNA2&quot;, &quot;CNTNAP2&quot;, &quot;NALCN&quot;, &quot;RDH14&quot;, &quot;WWOX&quot;, &quot;GLT8D1&quot;, &quot;SFMBT2&quot;, &quot;SPRED1&quot;, &quot;ADAMTS14&quot;, &quot;TTC39B&quot;, &quot;SVEP1&quot;, &quot;COL28A1&quot;, &quot;PDZD8&quot;, &quot;GALC&quot;, &quot;SORL1&quot;, &quot;ITIH1&quot;, &quot;CLSPN&quot;, &quot;SLCO4A1&quot;, &quot;VPS13C&quot;, &quot;MYO18B&quot;, &quot;TTLL6&quot;, &quot;CRBN&quot;, &quot;NFATC2&quot;, &quot;SYNE1&quot;, &quot;INTS7&quot;, &quot;TMEM182&quot;, &quot;STT3A&quot;, &quot;WSCD1&quot;, &quot;KCNS3&quot;, &quot;PDGFRA&quot;),
+             'circadian'=c(&quot;YTHDC2&quot;, &quot;LRP1B&quot;, &quot;SAMD4A&quot;, &quot;VTA1&quot;, &quot;NALCN&quot;, &quot;F13A1&quot;, &quot;SLC4A1&quot;, &quot;TMEM26&quot;, &quot;ADAMTS14&quot;, &quot;COL28A1&quot;, &quot;RNF19A&quot;, &quot;BRINP2&quot;, &quot;TRHR&quot;, &quot;CCBE1&quot;, &quot;CACNA2D3&quot;, &quot;MYO18A&quot;, &quot;SLC26A7&quot;, &quot;FRAS1&quot;, &quot;EP300&quot;, &quot;GNE&quot;, &quot;LMAN1&quot;, &quot;NMBR&quot;, &quot;TGFBI&quot;, &quot;CHAT&quot;, &quot;HIPK2&quot;, &quot;SERPINE2&quot;, &quot;RELB&quot;, &quot;ARHGEF12&quot;, &quot;SETX&quot;, &quot;CACNA1D&quot;, &quot;ADCY7&quot;, &quot;NBAS&quot;, &quot;GPR83&quot;, &quot;LTBP3&quot;, &quot;GABRB3&quot;, &quot;HMBS&quot;, &quot;PSMA4&quot;, &quot;MADD&quot;, &quot;SIX3&quot;, &quot;EPHB1&quot;, &quot;GAK&quot;, &quot;SPRY4&quot;, &quot;ABCA13&quot;, &quot;SLC8A3&quot;, &quot;HIVEP2&quot;, &quot;FAH&quot;, &quot;ADCY6&quot;, &quot;MYLIP&quot;, &quot;NFE2L1&quot;, &quot;PRKAG1&quot;, &quot;HDAC2&quot;, &quot;TNS1&quot;, &quot;GSS&quot;, &quot;CACNA1H&quot;, &quot;POLL&quot;, &quot;CPT1A&quot;, &quot;CAPN2&quot;, &quot;PITX3&quot;, &quot;NFE2L3&quot;, &quot;PNPLA7&quot;, &quot;AGA&quot;, &quot;STX16&quot;, &quot;TNK2&quot;, &quot;PRF1&quot;, &quot;RYR3&quot;, &quot;DIXDC1&quot;, &quot;PSEN2&quot;, &quot;SREBF1&quot;, &quot;POLE&quot;, &quot;RAB11FIP5&quot;, &quot;KIF1B&quot;, &quot;RAB5A&quot;, &quot;NGB&quot;, &quot;ARHGEF11&quot;, &quot;SIX6&quot;, &quot;SDK1&quot;, &quot;AATK&quot;, &quot;CYP7A1&quot;, &quot;CUL9&quot;),
+             'dementia'=c(&quot;LMAN1&quot;, &quot;PRDX3&quot;, &quot;NPLOC4&quot;, &quot;PSEN2&quot;, &quot;ZFYVE16&quot;, &quot;CHAT&quot;, &quot;PENK&quot;, &quot;LTBP1&quot;, &quot;SNCAIP&quot;, &quot;NOL11&quot;, &quot;GANAB&quot;, &quot;DLD&quot;, &quot;SPG11&quot;, &quot;IGSF21&quot;, &quot;RNF19A&quot;, &quot;ASIC2&quot;, &quot;ASTN1&quot;, &quot;SORL1&quot;, &quot;SPRY4&quot;, &quot;VCP&quot;, &quot;TATDN1&quot;, &quot;RAB5A&quot;, &quot;VPS13C&quot;, &quot;GM2A&quot;, &quot;IRS1&quot;, &quot;PSMB4&quot;, &quot;NGB&quot;, &quot;F2RL1&quot;, &quot;RAB38&quot;, &quot;SMOX&quot;, &quot;PARP1&quot;, &quot;ABCC9&quot;, &quot;RPN2&quot;, &quot;CAPN2&quot;, &quot;GALNT7&quot;, &quot;SMG1&quot;, &quot;TBK1&quot;, &quot;MASP2&quot;, &quot;GNE&quot;, &quot;GTPBP4&quot;, &quot;CCT8&quot;, &quot;CD63&quot;, &quot;PSMA4&quot;, &quot;TUBA4A&quot;, &quot;CUL9&quot;)
+            )
+    
+Hmat &lt;- lapply(seq_along(H), \(i) {
+Set &lt;- names(H)[i]
+data.frame(Element = H[[i]], Set)
+    })
+Hmat &lt;- do.call(rbind, Hmat)
+vd &lt;- venneuler(Hmat)
+plot(vd)
+</code></pre>
+<p>and got the output as:
+<a href=""https://i.stack.imgur.com/nWR3R.png"" rel=""nofollow noreferrer""><img src=""https://i.stack.imgur.com/nWR3R.png"" alt=""Venn"" /></a></p>
+<p>How do I add the count (number) inside the each circle?</p>
+"
